@@ -53,7 +53,10 @@ For the MAGMA gene-set analysis, we defined a series of nested gene sets contain
 * `DEGs_log2FC_5`: genes with `log2FoldChange >= 5` 
 * `DEGs_log2FC_6`: genes with `log2FoldChange >= 6` 
 
-Each cutoff is a subset of the previous one (e.g. all genes in `DEGs_log2FC_6` are also in `DEGs_log2FC_5`, etc.), so this series lets us see whether enrichment for AD genetic signal changes as we restrict to more strongly induced genes. Ensembl gene IDs were converted to Entrez Gene IDs (the gene identifiers used by MAGMA) and written to `geneset_log2FC.txt`, which was supplied to MAGMA via `--set-annot`. The exact number of genes from each set that could be matched to the MAGMA gene-level results is reported in the `NGENES` column of the result tables below.
+Each cutoff is a subset of the previous one (e.g. all genes in `DEGs_log2FC_6` are also in `DEGs_log2FC_5`, etc.), 
+
+
+<!-- so this series lets us see whether enrichment for AD genetic signal changes as we restrict to more strongly induced genes. Ensembl gene IDs were converted to Entrez Gene IDs (the gene identifiers used by MAGMA) and written to `geneset_log2FC.txt`, which was supplied to MAGMA via `--set-annot`. The exact number of genes from each set that could be matched to the MAGMA gene-level results is reported in the `NGENES` column of the result tables below. -->
 
 # MAGMA gene-set analysis
 
