@@ -1,0 +1,112 @@
+---
+title: "MAGMA gene-set analysis for the up-regulated DEGs from KOLF2.1J iTF-Microglia"
+author: "XSun"
+date: "2026-06-10"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(data.table)
+```
+
+# Introduction
+
+Paper: [KOLF2.1J iTF-Microglia: A standardized platform to study microglial transcriptional regulatory networks in CNS disease](https://www.biorxiv.org/content/10.1101/2025.05.30.657077v1.full)
+
+The authors profiled RNA-seq across several iPSC-derived cell types/conditions and reported differentially expressed genes (DEGs) for a number of pairwise comparisons in their **Table S1**.
+
+Here we focus on the comparison **"LPS+IFNG-treated iTF-Microglia vs untreated iTF-Microglia"**, i.e. the transcriptional response of iTF-Microglia to an inflammatory (LPS + IFN-gamma) stimulus. Genes with a **positive `log2FoldChange`** are up-regulated by the LPS+IFNG treatment.
+
+Our goal is to test whether genes that are strongly up-regulated upon this inflammatory stimulus are, as a set, enriched for genetic association signal with Alzheimer's disease (AD), using **MAGMA gene-set analysis** on two AD GWAS.
+
+```{r}
+
+genes_all <- readxl::read_excel("/project2/xinhe/xsun/AD/data/DEGs_Nunez.xlsx")
+colnames(genes_all) <- genes_all[1,]
+genes_all <- genes_all[-1,]
+genes_all <- as.data.frame(genes_all)
+colnames(genes_all)[1] <- "gene_ensg"
+
+genes <- genes_all[genes_all$`Wald test comparison` == "LPS+IFNG-treated iTF-Microglia vs untreated iTF-Microglia",]
+
+
+DT::datatable(genes,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','DEGs -- LPS+IFNG-treated iTF-Microglia vs untreated iTF-Microglia'),options = list(pageLength = 10) )
+
+
+hist(as.numeric(genes$log2FoldChange), breaks = 50, xlab = "log2FoldChange (LPS+IFNG vs untreated)", main = "Distribution of log2FoldChange")
+```
+
+The histogram shows the `log2FoldChange` for all `r nrow(genes)` genes tested in this comparison. Values to the right of 0 are genes induced (up-regulated) by LPS+IFNG treatment; values to the left are repressed (down-regulated).
+
+# Defining the DEG gene sets used in MAGMA
+
+For the MAGMA gene-set analysis, we defined a series of nested gene sets containing genes that are **up-regulated upon LPS+IFNG treatment**, using increasingly stringent `log2FoldChange` cutoffs:
+
+* `DEGs_log2FC_0.5`: genes with `log2FoldChange >= 0.5` (>= ~1.4-fold up-regulation)
+* `DEGs_log2FC_1`: genes with `log2FoldChange >= 1` 
+* `DEGs_log2FC_2`: genes with `log2FoldChange >= 2` 
+* `DEGs_log2FC_3`: genes with `log2FoldChange >= 3` 
+* `DEGs_log2FC_4`: genes with `log2FoldChange >= 4` 
+* `DEGs_log2FC_5`: genes with `log2FoldChange >= 5` 
+* `DEGs_log2FC_6`: genes with `log2FoldChange >= 6` 
+
+Each cutoff is a subset of the previous one (e.g. all genes in `DEGs_log2FC_6` are also in `DEGs_log2FC_5`, etc.), so this series lets us see whether enrichment for AD genetic signal changes as we restrict to more strongly induced genes. Ensembl gene IDs were converted to Entrez Gene IDs (the gene identifiers used by MAGMA) and written to `geneset_log2FC.txt`, which was supplied to MAGMA via `--set-annot`. The exact number of genes from each set that could be matched to the MAGMA gene-level results is reported in the `NGENES` column of the result tables below.
+
+# MAGMA gene-set analysis
+
+<!-- [MAGMA](https://ctg.cncr.nl/software/magma) gene-set analysis tests whether a pre-defined set of genes shows, on average, **stronger genetic association with a trait** (here, AD) than the rest of the genes in the genome. -->
+
+<!-- The analysis proceeds in two steps: -->
+
+<!-- 1. **Gene-level analysis**: GWAS SNP-level p-values are aggregated into a gene-level association statistic (Z-score) for every gene, accounting for linkage disequilibrium between SNPs (using the 1000 Genomes European reference panel). -->
+<!-- 2. **Gene-set (competitive) analysis**: for each DEG set defined above, MAGMA fits a regression of the gene-level Z-scores on a 0/1 indicator of set membership, while conditioning on technical covariates (gene size, gene density, inverse minor allele count, and their logs) that are known to affect gene-level statistics. -->
+
+<!-- The test direction is **one-sided, positive**: it tests whether genes in the set have, on average, *higher* association statistics than genes outside the set (i.e. enrichment for AD signal), not whether they have lower statistics. -->
+
+Columns in the result tables:
+
+* `VARIABLE`: name of the DEG gene set
+* `NGENES`: number of genes from the set that were matched to the MAGMA gene-level results
+* `BETA` / `BETA_STD`: regression coefficient (raw and standardized) for set membership; a positive value indicates the gene set is enriched for AD association signal
+* `SE`: standard error of `BETA`
+* `P`: one-sided p-value for enrichment (`BETA > 0`)
+
+<!-- With 7 gene sets tested per GWAS, a Bonferroni-corrected significance threshold would be approximately `0.05 / 7 ≈ 0.007`. -->
+
+# MAGMA results -- GWAS from PMID35379992
+
+GWAS: Bellenguez et al. 2022, [PMID 35379992](https://pubmed.ncbi.nlm.nih.gov/35379992/), "New insights into the genetic etiology of Alzheimer's disease and related dementias" (European-ancestry AD/dementia GWAS, N ~ 788,989).
+
+```{r}
+
+results <- fread(
+  "/project2/xinhe/xsun/AD/data/data_magma/genesetanalysis/DEGs_log2FC_AD_PMID35379992.gsa.out",
+  skip = "VARIABLE"
+)
+
+DT::datatable(results,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','MAGMA results for up-regulated DEGs at different log2FC cutoffs, GWAS from PMID35379992'),options = list(pageLength = 10) )
+
+```
+
+None of the 7 DEG sets reach nominal significance (all `P > 0.05`)
+
+# MAGMA results -- GWAS from PMID30617256
+
+GWAS: Jansen et al. 2019, [PMID 30617256](https://pubmed.ncbi.nlm.nih.gov/30617256/), "Genome-wide meta-analysis identifies new loci and functional pathways influencing Alzheimer's disease risk" (N ~ 455,258).
+
+```{r}
+
+results <- fread(
+  "/project2/xinhe/xsun/AD/data/data_magma/genesetanalysis/AD_PMID30617256_DEGs_log2FC.gsa.out",
+  skip = "VARIABLE"
+)
+
+DT::datatable(results,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','MAGMA results for up-regulated DEGs at different log2FC cutoffs, GWAS from PMID30617256'),options = list(pageLength = 10) )
+
+```
+
+As with PMID35379992, none of the 7 DEG sets are significant (all `P > 0.05`).
+

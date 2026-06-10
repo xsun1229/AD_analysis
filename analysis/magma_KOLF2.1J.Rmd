@@ -1,0 +1,67 @@
+---
+title: "MAGMA analysis for the DEGs from paper KOLF2.1J iTF-Microglia: A standardized platform to study microglial transcriptional regulatory networks in CNS disease"
+author: "XSun"
+date: "2026-06-10"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+Paper: [KOLF2.1J iTF-Microglia: A standardized platform to study microglial transcriptional regulatory networks in CNS disease](https://www.biorxiv.org/content/10.1101/2025.05.30.657077v1.full)
+
+The authors profiled RNA-seq in different cell types/conditions. We focus on Microglia cells, untreated and treated. The paper found DEGs upon treatment - see Table S1.
+
+```{r}
+
+library(data.table)
+
+genes_all <- readxl::read_excel("/project2/xinhe/xsun/AD/data/DEGs_Nunez.xlsx")
+colnames(genes_all) <- genes_all[1,]
+genes_all <- genes_all[-1,]
+genes_all <- as.data.frame(genes_all)
+colnames(genes_all)[1] <- "gene_ensg"
+
+genes <- genes_all[genes_all$`Wald test comparison` == "LPS+IFNG-treated iTF-Microglia vs untreated iTF-Microglia",]
+
+
+DT::datatable(genes,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','DEGs -- LPS+IFNG-treated iTF-Microglia vs untreated iTF-Microglia'),options = list(pageLength = 10) )
+
+
+hist(as.numeric(genes$log2FoldChange))
+```
+
+
+# MAGMA using GWAS from PMID35379992
+
+
+```{r}
+
+results <- fread(
+  "/project2/xinhe/xsun/AD/data/data_magma/genesetanalysis/DEGs_log2FC_AD_PMID35379992.gsa.out",
+  skip = "VARIABLE"
+)
+
+DT::datatable(results,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','MAGMA results for genes at different cutoffs, GWAS from PMID35379992'),options = list(pageLength = 10) )
+
+```
+
+
+
+# MAGMA using GWAS from PMID30617256
+
+
+```{r}
+
+results <- fread(
+  "/project2/xinhe/xsun/AD/data/data_magma/genesetanalysis/AD_PMID30617256_DEGs_log2FC.gsa.out",
+  skip = "VARIABLE"
+)
+
+DT::datatable(results,caption = htmltools::tags$caption( style = 'caption-side: left; text-align: left; color:black;  font-size:150% ;','MAGMA results for genes at different cutoffs, GWAS from PMID30617256'),options = list(pageLength = 10) )
+
+```
+
+
+
