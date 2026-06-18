@@ -10,3 +10,7 @@ editor_options:
 
 
 [MAGMA gene-set analysis for the up-regulated DEGs from KOLF2.1J iTF-Microglia](magma_KOLF2.1J_DEGs.html)
+
+ctwas analysis for AD gwas 
+
+[Preparing weights](weights_prepare.html)

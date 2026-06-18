@@ -281,7 +281,7 @@ $(document).ready(function () {
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-workflowr <span class="glyphicon glyphicon-ok text-success"
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span>
 </button>
 </p>
@@ -292,8 +292,8 @@ aria-hidden="true"></span>
 </li>
 <li>
 <a data-toggle="tab" href="#checks"> Checks <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
-</a>
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -302,13 +302,13 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-06-10
+<strong>Last updated:</strong> 2026-06-18
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
-aria-hidden="true"></span> 0
+aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>AD_analysis/</code> <span
@@ -331,33 +331,36 @@ versions</em> tab lists the development history.
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
-<span class="glyphicon glyphicon-ok text-success"
-aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
-</a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate"
+<div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git
-repository, you know the exact version of the code that produced these
-results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ctwasTibetantree321c7c2960772806b8c7d4d2a22e45840dd73420targetblank321c7c2a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ADanalysistree052c2cf7526c38abf594e7f7dff2c2ab2a7c1b2etargetblank052c2cfa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/ctwas_Tibetan/tree/321c7c2960772806b8c7d4d2a22e45840dd73420" target="_blank">321c7c2</a>
+<a href="https://github.com/xsun1229/AD_analysis/tree/052c2cf7526c38abf594e7f7dff2c2ab2a7c1b2e" target="_blank">052c2cf</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ctwasTibetantree321c7c2960772806b8c7d4d2a22e45840dd73420targetblank321c7c2a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ADanalysistree052c2cf7526c38abf594e7f7dff2c2ab2a7c1b2etargetblank052c2cfa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -367,7 +370,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/ctwas_Tibetan/tree/321c7c2960772806b8c7d4d2a22e45840dd73420" target="_blank">321c7c2</a>.
+<a href="https://github.com/xsun1229/AD_analysis/tree/052c2cf7526c38abf594e7f7dff2c2ab2a7c1b2e" target="_blank">052c2cf</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -382,313 +385,10 @@ were generated:
 </p>
 <pre><code>
 Untracked files:
-    Untracked:  AD_analysis/
-    Untracked:  factor_analysis/
-    Untracked:  factor_analysis_new/
-    Untracked:  heart_atlas/
-    Untracked:  heart_project/
-    Untracked:  module_analysis/
-    Untracked:  multigroup_ctwas_analysis/
-    Untracked:  mutation_rate/
-    Untracked:  pathway_analysis/
-    Untracked:  proteome_alzheimer/
-    Untracked:  pumseq/
+    Untracked:  analysis/weights_prepare.Rmd
 
 Unstaged changes:
-    Deleted:    ctwas_Tibetan/.Rprofile
-    Deleted:    ctwas_Tibetan/.gitattributes
-    Deleted:    ctwas_Tibetan/.gitignore
-    Deleted:    ctwas_Tibetan/README.md
-    Deleted:    ctwas_Tibetan/_workflowr.yml
-    Deleted:    ctwas_Tibetan/analysis/_site.yml
-    Deleted:    ctwas_Tibetan/analysis/about.Rmd
-    Deleted:    ctwas_Tibetan/analysis/index.Rmd
-    Deleted:    ctwas_Tibetan/analysis/license.Rmd
-    Deleted:    ctwas_Tibetan/analysis/multi_tissue.Rmd
-    Deleted:    ctwas_Tibetan/analysis/single_tissue.Rmd
-    Deleted:    ctwas_Tibetan/analysis/uncorrelated_tissue.Rmd
-    Deleted:    ctwas_Tibetan/code/README.md
-    Deleted:    ctwas_Tibetan/ctwas_Tibetan.Rproj
-    Deleted:    ctwas_Tibetan/data/README.md
-    Deleted:    ctwas_Tibetan/docs/.nojekyll
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-2-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-2-4.png
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-3-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-3-4.png
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-4-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-4-4.png
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-5-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/multi_tissue.Rmd/unnamed-chunk-5-4.png
-    Deleted:    ctwas_Tibetan/docs/figure/single_tissue.Rmd/unnamed-chunk-2-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/single_tissue.Rmd/unnamed-chunk-2-2.png
-    Deleted:    ctwas_Tibetan/docs/figure/single_tissue.Rmd/unnamed-chunk-3-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/single_tissue.Rmd/unnamed-chunk-4-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/single_tissue.Rmd/unnamed-chunk-4-2.png
-    Deleted:    ctwas_Tibetan/docs/figure/single_tissue.Rmd/unnamed-chunk-5-1.png
-    Deleted:    ctwas_Tibetan/docs/figure/uncorrelated_tissue.Rmd/unnamed-chunk-4-2.png
-    Deleted:    ctwas_Tibetan/docs/figure/uncorrelated_tissue.Rmd/unnamed-chunk-5-2.png
-    Deleted:    ctwas_Tibetan/docs/figure/uncorrelated_tissue.Rmd/unnamed-chunk-6-2.png
-    Deleted:    ctwas_Tibetan/docs/figure/uncorrelated_tissue.Rmd/unnamed-chunk-7-2.png
-    Deleted:    ctwas_Tibetan/docs/index.html
-    Deleted:    ctwas_Tibetan/docs/multi_tissue.html
-    Deleted:    ctwas_Tibetan/docs/single_tissue.html
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.css.map
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap.css.map
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/cerulean.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/cosmo.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/darkly.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/flatly.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Lato.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/LatoBold.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/LatoItalic.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/NewsCycle.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/NewsCycleBold.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSans.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansBold.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansBoldItalic.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansItalic.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansLight.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansLightItalic.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Raleway.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RalewayBold.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Roboto.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoBold.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoLight.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoMedium.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansPro.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProBold.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProItalic.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProLight.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Ubuntu.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/journal.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/lumen.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/paper.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/readable.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/sandstone.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/simplex.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/spacelab.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/united.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/css/yeti.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.eot
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.svg
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.woff
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.woff2
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/js/bootstrap.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/js/bootstrap.min.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/js/npm.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/shim/html5shiv.min.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/bootstrap-3.3.5/shim/respond.min.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/crosstalk-1.2.0/css/crosstalk.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/crosstalk-1.2.0/js/crosstalk.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/crosstalk-1.2.0/js/crosstalk.js.map
-    Deleted:    ctwas_Tibetan/docs/site_libs/crosstalk-1.2.0/js/crosstalk.min.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/crosstalk-1.2.0/js/crosstalk.min.js.map
-    Deleted:    ctwas_Tibetan/docs/site_libs/crosstalk-1.2.0/scss/crosstalk.scss
-    Deleted:    ctwas_Tibetan/docs/site_libs/datatables-binding-0.22/datatables.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/datatables-css-0.0.0/datatables-crosstalk.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/dt-core-1.11.3/css/jquery.dataTables.extra.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/dt-core-1.11.3/css/jquery.dataTables.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/dt-core-1.11.3/js/jquery.dataTables.min.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/css/all.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/css/v4-shims.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-brands-400.eot
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-brands-400.svg
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-brands-400.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-brands-400.woff
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-brands-400.woff2
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-regular-400.eot
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-regular-400.svg
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-regular-400.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-regular-400.woff
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-regular-400.woff2
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-solid-900.eot
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-solid-900.svg
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-solid-900.ttf
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-solid-900.woff
-    Deleted:    ctwas_Tibetan/docs/site_libs/font-awesome-5.1.0/webfonts/fa-solid-900.woff2
-    Deleted:    ctwas_Tibetan/docs/site_libs/header-attrs-2.14/header-attrs.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/highlightjs-9.12.0/default.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/highlightjs-9.12.0/highlight.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/highlightjs-9.12.0/textmate.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/htmlwidgets-1.5.4/htmlwidgets.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/jquery-3.6.0/jquery-3.6.0.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/jquery-3.6.0/jquery-3.6.0.min.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/jquery-3.6.0/jquery-3.6.0.min.map
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/README
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/images/ui-icons_444444_256x240.png
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/images/ui-icons_555555_256x240.png
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/images/ui-icons_777620_256x240.png
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/images/ui-icons_777777_256x240.png
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/images/ui-icons_cc0000_256x240.png
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/images/ui-icons_ffffff_256x240.png
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/index.html
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.min.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.structure.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.structure.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.theme.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/jqueryui-1.11.4/jquery-ui.theme.min.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/navigation-1.1/codefolding-lua.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/navigation-1.1/codefolding.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/navigation-1.1/sourceembed.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/navigation-1.1/tabsets.js
-    Deleted:    ctwas_Tibetan/docs/site_libs/tocify-1.9.1/jquery.tocify.css
-    Deleted:    ctwas_Tibetan/docs/site_libs/tocify-1.9.1/jquery.tocify.js
-    Deleted:    ctwas_Tibetan/docs/uncorrelated_tissue.html
-    Deleted:    ctwas_Tibetan/output/README.md
-    Deleted:    ctwas_tibetan/.Rprofile
-    Deleted:    ctwas_tibetan/.gitattributes
-    Deleted:    ctwas_tibetan/.gitignore
-    Deleted:    ctwas_tibetan/README.md
-    Deleted:    ctwas_tibetan/_workflowr.yml
-    Deleted:    ctwas_tibetan/analysis/_site.yml
-    Deleted:    ctwas_tibetan/analysis/about.Rmd
-    Deleted:    ctwas_tibetan/analysis/index.Rmd
-    Deleted:    ctwas_tibetan/analysis/license.Rmd
-    Deleted:    ctwas_tibetan/code/README.md
-    Deleted:    ctwas_tibetan/ctwas_tibetan.Rproj
-    Deleted:    ctwas_tibetan/data/README.md
-    Deleted:    ctwas_tibetan/docs/.nojekyll
-    Deleted:    ctwas_tibetan/docs/about.html
-    Deleted:    ctwas_tibetan/docs/index.html
-    Deleted:    ctwas_tibetan/docs/license.html
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.css.map
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap.css.map
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/bootstrap.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/cerulean.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/cosmo.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/darkly.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/flatly.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Lato.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/LatoBold.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/LatoItalic.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/NewsCycle.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/NewsCycleBold.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSans.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansBold.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansBoldItalic.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansItalic.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansLight.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansLightItalic.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Raleway.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RalewayBold.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Roboto.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoBold.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoLight.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoMedium.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansPro.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProBold.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProItalic.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProLight.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/fonts/Ubuntu.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/journal.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/lumen.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/paper.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/readable.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/sandstone.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/simplex.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/spacelab.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/united.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/css/yeti.min.css
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.eot
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.svg
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.ttf
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.woff
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.woff2
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/js/bootstrap.js
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/js/bootstrap.min.js
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/js/npm.js
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/shim/html5shiv.min.js
-    Deleted:    ctwas_tibetan/docs/site_libs/bootstrap-3.3.5/shim/respond.min.js
-    Deleted:    ctwas_tibetan/docs/site_libs/header-attrs-2.14/header-attrs.js
-    Deleted:    ctwas_tibetan/docs/site_libs/highlightjs-9.12.0/default.css
-    Deleted:    ctwas_tibetan/docs/site_libs/highlightjs-9.12.0/highlight.js
-    Deleted:    ctwas_tibetan/docs/site_libs/highlightjs-9.12.0/textmate.css
-    Deleted:    ctwas_tibetan/docs/site_libs/jquery-3.6.0/jquery-3.6.0.js
-    Deleted:    ctwas_tibetan/docs/site_libs/jquery-3.6.0/jquery-3.6.0.min.js
-    Deleted:    ctwas_tibetan/docs/site_libs/jquery-3.6.0/jquery-3.6.0.min.map
-    Deleted:    ctwas_tibetan/docs/site_libs/navigation-1.1/codefolding-lua.css
-    Deleted:    ctwas_tibetan/docs/site_libs/navigation-1.1/codefolding.js
-    Deleted:    ctwas_tibetan/docs/site_libs/navigation-1.1/sourceembed.js
-    Deleted:    ctwas_tibetan/docs/site_libs/navigation-1.1/tabsets.js
-    Deleted:    ctwas_tibetan/output/README.md
-    Deleted:    neuron_stimulation/analysis/_site.yml
-    Deleted:    neuron_stimulation/docs/.nojekyll
-    Deleted:    neuron_stimulation/docs/about.html
-    Deleted:    neuron_stimulation/docs/index.html
-    Deleted:    neuron_stimulation/docs/license.html
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.css.map
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/bootstrap-theme.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/bootstrap.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/bootstrap.css.map
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/bootstrap.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/cerulean.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/cosmo.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/darkly.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/flatly.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/Lato.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/LatoBold.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/LatoItalic.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/NewsCycle.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/NewsCycleBold.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSans.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansBold.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansBoldItalic.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansItalic.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansLight.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/OpenSansLightItalic.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/Raleway.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/RalewayBold.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/Roboto.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoBold.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoLight.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/RobotoMedium.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansPro.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProBold.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProItalic.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/SourceSansProLight.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/fonts/Ubuntu.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/journal.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/lumen.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/paper.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/readable.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/sandstone.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/simplex.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/spacelab.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/united.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/css/yeti.min.css
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.eot
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.svg
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.ttf
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.woff
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/fonts/glyphicons-halflings-regular.woff2
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/js/bootstrap.js
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/js/bootstrap.min.js
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/js/npm.js
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/shim/html5shiv.min.js
-    Deleted:    neuron_stimulation/docs/site_libs/bootstrap-3.3.5/shim/respond.min.js
-    Deleted:    neuron_stimulation/docs/site_libs/header-attrs-2.25/header-attrs.js
-    Deleted:    neuron_stimulation/docs/site_libs/highlightjs-9.12.0/default.css
-    Deleted:    neuron_stimulation/docs/site_libs/highlightjs-9.12.0/highlight.js
-    Deleted:    neuron_stimulation/docs/site_libs/highlightjs-9.12.0/textmate.css
-    Deleted:    neuron_stimulation/docs/site_libs/jquery-3.6.0/jquery-3.6.0.js
-    Deleted:    neuron_stimulation/docs/site_libs/jquery-3.6.0/jquery-3.6.0.min.js
-    Deleted:    neuron_stimulation/docs/site_libs/jquery-3.6.0/jquery-3.6.0.min.map
-    Deleted:    neuron_stimulation/docs/site_libs/navigation-1.1/codefolding-lua.css
-    Deleted:    neuron_stimulation/docs/site_libs/navigation-1.1/codefolding.js
-    Deleted:    neuron_stimulation/docs/site_libs/navigation-1.1/sourceembed.js
-    Deleted:    neuron_stimulation/docs/site_libs/navigation-1.1/tabsets.js
+    Modified:   analysis/index.Rmd
 
 </code></pre>
 <p>
@@ -703,16 +403,81 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
+
 <p>
-There are no past versions. Publish this analysis with
-<code>wflow_publish()</code> to start tracking its development.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
+(<code>docs/index.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
 </p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/AD_analysis/blob/bfcf003be4cd8f3604d63beac69df658e4075dde/analysis/index.Rmd" target="_blank">bfcf003</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-06-10
+</td>
+<td>
+Initial commit
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/AD_analysis/bfcf003be4cd8f3604d63beac69df658e4075dde/docs/index.html" target="_blank">bfcf003</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-06-10
+</td>
+<td>
+Initial commit
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <hr>
 </div>
 </div>
 </div>
 <p><a href="magma_KOLF2.1J_DEGs.html">MAGMA gene-set analysis for the
 up-regulated DEGs from KOLF2.1J iTF-Microglia</a></p>
+<p>ctwas analysis for AD gwas</p>
+<p><a href="weights_prepare.html">Preparing weights</a></p>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
