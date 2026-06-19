@@ -1,0 +1,97 @@
+---
+title: "cTWAS Results Summary-AD GWAS (Bellenguez et al. 2022)"
+author: "XSun"
+date: "2026-06-19"
+output:
+  workflowr::wflow_html:
+    code_folding: hide
+    toc: true
+---
+
+We ran the multi-group ctwas with parameters: L=5, shared_all, thin=1
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(ctwas)
+library(ggplot2)
+library(DT)
+
+gwas_n <- 487511
+outputdir <- "/project/xinhe/xsun/AD_jubao/3.ctwas/output"
+qtl_types <- c("caQTL", "eQTL")
+```
+
+# caQTL
+
+```{r caQTL-load}
+param_caQTL <- readRDS(file.path(outputdir, "caQTL", "AD.caQTL.param.shared_all.RDS"))
+```
+
+## Convergence
+
+```{r caQTL-convergence, fig.width=10, fig.height=6}
+make_convergence_plots(param_caQTL, gwas_n)
+```
+
+## Parameters and Enrichment
+
+```{r caQTL-param}
+ctwas_param_caQTL <- summarize_param(param_caQTL, gwas_n, enrichment_test = "fisher")
+ctwas_param_caQTL
+```
+
+## Heritability Pie Chart
+
+```{r caQTL-piechart, fig.width=6, fig.height=5}
+pve_caQTL <- data.frame(
+  category = names(ctwas_param_caQTL$prop_heritability),
+  percentage = ctwas_param_caQTL$prop_heritability
+)
+pve_caQTL$label <- paste0(round(pve_caQTL$percentage * 100, 1), "%")
+
+ggplot(pve_caQTL, aes(x = "", y = percentage, fill = category)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  theme_void() +
+  geom_text(aes(label = label),
+            position = position_stack(vjust = 0.5), size = 4) +
+  labs(fill = "Group", title = "caQTL-Percent of Heritability (PVE)")
+```
+
+# eQTL
+
+```{r eQTL-load}
+param_eQTL <- readRDS(file.path(outputdir, "eQTL", "AD.eQTL.param.shared_all.RDS"))
+```
+
+## Convergence
+
+```{r eQTL-convergence, fig.width=10, fig.height=6}
+make_convergence_plots(param_eQTL, gwas_n)
+```
+
+## Parameters and Enrichment
+
+```{r eQTL-param}
+ctwas_param_eQTL <- summarize_param(param_eQTL, gwas_n, enrichment_test = "fisher")
+ctwas_param_eQTL
+```
+
+## Heritability Pie Chart
+
+```{r eQTL-piechart, fig.width=6, fig.height=5}
+pve_eQTL <- data.frame(
+  category = names(ctwas_param_eQTL$prop_heritability),
+  percentage = ctwas_param_eQTL$prop_heritability
+)
+pve_eQTL$label <- paste0(round(pve_eQTL$percentage * 100, 1), "%")
+
+ggplot(pve_eQTL, aes(x = "", y = percentage, fill = category)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  theme_void() +
+  geom_text(aes(label = label),
+            position = position_stack(vjust = 0.5), size = 4) +
+  labs(fill = "Group", title = "eQTL-Percent of Heritability (PVE)")
+```

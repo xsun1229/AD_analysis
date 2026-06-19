@@ -14,3 +14,5 @@ editor_options:
 ctwas analysis for AD gwas 
 
 [Preparing weights](weights_prepare.html)
+
+[cTWAS Results Summary — AD GWAS (Bellenguez et al. 2022)](ctwas_Bellenguez.html)

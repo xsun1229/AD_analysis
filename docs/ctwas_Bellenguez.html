@@ -11,9 +11,9 @@
 
 <meta name="author" content="XSun" />
 
-<meta name="date" content="2026-06-18" />
+<meta name="date" content="2026-06-19" />
 
-<title>Preparing weights</title>
+<title>cTWAS Results Summary-AD GWAS (Bellenguez et al. 2022)</title>
 
 <script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -363,9 +363,10 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Preparing weights</h1>
+<h1 class="title toc-ignore">cTWAS Results Summary-AD GWAS (Bellenguez
+et al. 2022)</h1>
 <h4 class="author">XSun</h4>
-<h4 class="date">2026-06-18</h4>
+<h4 class="date">2026-06-19</h4>
 
 </div>
 
@@ -394,7 +395,7 @@ aria-hidden="true"></span> </a>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-06-18
+<strong>Last updated:</strong> 2026-06-19
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -432,10 +433,10 @@ changes </a>
 <div id="strongRMarkdownfilestronguncommittedchanges"
 class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of
-the R Markdown file created these results, you’ll want to first commit
-it to the Git repo. If you’re still working on the analysis, you can
-ignore this warning. When you’re finished, you can run
+<p>The R Markdown is untracked by Git. To know which version of the R
+Markdown file created these results, you’ll want to first commit it to
+the Git repo. If you’re still working on the analysis, you can ignore
+this warning. When you’re finished, you can run
 <code>wflow_publish</code> to commit the R Markdown file and build the
 HTML.</p>
 </div>
@@ -560,7 +561,14 @@ depends on. Below is the status of the Git repository when the results
 were generated:
 </p>
 <pre><code>
+Ignored files:
+    Ignored:    analysis/figure/
+
+Untracked files:
+    Untracked:  analysis/ctwas_Bellenguez.Rmd
+
 Unstaged changes:
+    Modified:   analysis/index.Rmd
     Modified:   analysis/weights_prepare.Rmd
 
 </code></pre>
@@ -576,350 +584,144 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/weights_prepare.Rmd</code>) and
-HTML (<code>docs/weights_prepare.html</code>) files. If you’ve
-configured a remote Git repository (see <code>?wflow_git_remote</code>),
-click on the hyperlinks in the table below to view the files as they
-were in that past version.
+There are no past versions. Publish this analysis with
+<code>wflow_publish()</code> to start tracking its development.
 </p>
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-File
-</th>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-<th>
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/xsun1229/AD_analysis/blob/9bc6f4a208dce56051825d745e023710e54dea5d/analysis/weights_prepare.Rmd" target="_blank">9bc6f4a</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-06-18
-</td>
-<td>
-update
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/xsun1229/AD_analysis/9bc6f4a208dce56051825d745e023710e54dea5d/docs/weights_prepare.html" target="_blank">9bc6f4a</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-06-18
-</td>
-<td>
-update
-</td>
-</tr>
-</tbody>
-</table>
-</div>
 <hr>
 </div>
 </div>
 </div>
-<div id="data-source" class="section level1">
-<h1>Data source</h1>
-<p>QTL data from <a
-href="https://pubmed.ncbi.nlm.nih.gov/29379200/">Alasoo et al. 2018
-(PMID 29379200)</a>, which mapped eQTLs and caQTLs in macrophages across
-4 stimulation conditions: naive, SL1344, IFNg, and IFNg_SL1344.</p>
-<p>Input files:
-<code>{e,ca}QTL_{condition}_RASQUAL_lead_only.txt.gz</code> — lead QTLs
-per gene/peak from RASQUAL.</p>
+<p>We ran the multi-group ctwas with parameters: L=5, shared_all,
+thin=1</p>
+<div id="caqtl" class="section level1">
+<h1>caQTL</h1>
+<pre class="r"><code>param_caQTL &lt;- readRDS(file.path(outputdir, &quot;caQTL&quot;, &quot;AD.caQTL.param.shared_all.RDS&quot;))</code></pre>
+<div id="convergence" class="section level2">
+<h2>Convergence</h2>
+<pre class="r"><code>make_convergence_plots(param_caQTL, gwas_n)</code></pre>
+<p><img src="figure/ctwas_Bellenguez.Rmd/caQTL-convergence-1.png" width="960" style="display: block; margin: auto;" /></p>
 </div>
-<div id="multiple-testing-correction-from-the-paper"
-class="section level1">
-<h1>Multiple testing correction (from the paper)</h1>
-<p>The paper applies two layers of multiple testing correction:</p>
-<ol style="list-style-type: decimal">
-<li><strong>Step 1 — Correcting for multiple variants per gene
-(cis-window)</strong>: Used EigenMT to estimate the number of
-independent tests in each gene’s cis-window (±500kb). This gives:
-<ul>
-<li><code>p_eigen</code>: nominal p-value corrected for the number of
-independent tests</li>
-<li><code>n_tests</code>: number of independent tests EigenMT
-estimated</li>
-</ul></li>
-<li><strong>Step 2 — Correcting across genes</strong>: Used
-Benjamini-Hochberg FDR on the EigenMT-corrected p-values. This gives:
-<ul>
-<li><code>fdr_thresh</code>: the empirical FDR threshold — QTLs where
-<code>p_eigen &lt; fdr_thresh</code> are significant</li>
-</ul></li>
-</ol>
-<p>The paper reports “up to 3,431 genes (eQTLs) and 20,788 chromatin
-regions (caQTLs)” at 10% FDR. These numbers come from RASQUAL with
-<code>p_eigen &lt; fdr_thresh</code>, which we reproduce exactly
-here.</p>
+<div id="parameters-and-enrichment" class="section level2">
+<h2>Parameters and Enrichment</h2>
+<pre class="r"><code>ctwas_param_caQTL &lt;- summarize_param(param_caQTL, gwas_n, enrichment_test = &quot;fisher&quot;)
+ctwas_param_caQTL</code></pre>
+<pre><code>$group_size
+ naive|caQTL SL1344|caQTL          SNP 
+       13252         8747      6661044 
+
+$group_prior
+ naive|caQTL SL1344|caQTL          SNP 
+1.617034e-03 4.054799e-03 4.845619e-05 
+
+$group_prior_var
+ naive|caQTL SL1344|caQTL          SNP 
+    17.35103     17.35103     17.35103 
+
+$log_enrichment
+ naive|caQTL SL1344|caQTL 
+    3.507689     4.426996 
+
+$log_enrichment_se
+ naive|caQTL SL1344|caQTL 
+   0.2229091    0.1765749 
+
+$enrichment_pval
+ naive|caQTL SL1344|caQTL 
+1.929299e-24 3.964290e-53 
+
+$group_pve
+ naive|caQTL SL1344|caQTL          SNP 
+0.0007626785 0.0012623197 0.0114876827 
+
+$total_pve
+[1] 0.01351268
+
+$prop_heritability
+ naive|caQTL SL1344|caQTL          SNP 
+  0.05644169   0.09341741   0.85014090 </code></pre>
 </div>
-<div id="data-overview" class="section level1">
-<h1>Data overview</h1>
-<table>
-<caption>Input RASQUAL QTL data overview</caption>
-<colgroup>
-<col width="5%" />
-<col width="10%" />
-<col width="15%" />
-<col width="10%" />
-<col width="9%" />
-<col width="29%" />
-<col width="11%" />
-<col width="8%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Type</th>
-<th align="left">Condition</th>
-<th align="right">Total genes/peaks</th>
-<th align="right">Unique SNPs</th>
-<th align="right">fdr_thresh</th>
-<th align="right">Significant (p_eigen &lt; fdr_thresh)</th>
-<th align="right">Median chisq</th>
-<th align="right">Max chisq</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">caQTL</td>
-<td align="left">IFNg</td>
-<td align="right">284929</td>
-<td align="right">217614</td>
-<td align="right">0.1430</td>
-<td align="right">20788</td>
-<td align="right">3.36</td>
-<td align="right">363.42</td>
-</tr>
-<tr class="even">
-<td align="left">caQTL</td>
-<td align="left">IFNg_SL1344</td>
-<td align="right">284941</td>
-<td align="right">216646</td>
-<td align="right">0.1157</td>
-<td align="right">11518</td>
-<td align="right">2.84</td>
-<td align="right">325.07</td>
-</tr>
-<tr class="odd">
-<td align="left">caQTL</td>
-<td align="left">SL1344</td>
-<td align="right">284941</td>
-<td align="right">216492</td>
-<td align="right">0.1169</td>
-<td align="right">12903</td>
-<td align="right">2.96</td>
-<td align="right">251.26</td>
-</tr>
-<tr class="even">
-<td align="left">caQTL</td>
-<td align="left">naive</td>
-<td align="right">284941</td>
-<td align="right">219780</td>
-<td align="right">0.1206</td>
-<td align="right">19605</td>
-<td align="right">3.29</td>
-<td align="right">326.99</td>
-</tr>
-<tr class="odd">
-<td align="left">eQTL</td>
-<td align="left">IFNg</td>
-<td align="right">13544</td>
-<td align="right">13041</td>
-<td align="right">0.1671</td>
-<td align="right">3332</td>
-<td align="right">9.29</td>
-<td align="right">2591.41</td>
-</tr>
-<tr class="even">
-<td align="left">eQTL</td>
-<td align="left">IFNg_SL1344</td>
-<td align="right">13547</td>
-<td align="right">12846</td>
-<td align="right">0.1437</td>
-<td align="right">2712</td>
-<td align="right">8.93</td>
-<td align="right">2401.41</td>
-</tr>
-<tr class="odd">
-<td align="left">eQTL</td>
-<td align="left">SL1344</td>
-<td align="right">13546</td>
-<td align="right">12940</td>
-<td align="right">0.1397</td>
-<td align="right">2693</td>
-<td align="right">9.01</td>
-<td align="right">1476.35</td>
-</tr>
-<tr class="even">
-<td align="left">eQTL</td>
-<td align="left">naive</td>
-<td align="right">13540</td>
-<td align="right">12997</td>
-<td align="right">0.1379</td>
-<td align="right">3431</td>
-<td align="right">9.52</td>
-<td align="right">1488.33</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="creating-prediction-models" class="section level1">
-<h1>Creating prediction models</h1>
-<ol style="list-style-type: decimal">
-<li><p><strong>Significance filtering</strong>: Only genes/peaks with
-<code>p_eigen &lt; fdr_thresh</code> were retained (matching the paper’s
-method).</p></li>
-<li><p><strong>Variant mapping</strong>: rsIDs were mapped to b38
-coordinates using the UKB LD reference variant info file
-(<code>/project2/compbio/UKB_LD_REF/ref_snp_info/ukb_b38_0.1_var_info.Rvar.gz</code>),
-constructing <code>varID</code> in the format
-<code>chr{chrom}_{pos}_{ref}_{alt}_b38</code>.</p></li>
-<li><p><strong>Weight creation</strong>: Used
-<code>ctwas::create_predictdb_from_QTLs()</code> with:</p>
-<ul>
-<li><code>use_top_QTL = TRUE</code>: one QTL per gene/peak</li>
-<li><code>select_by = "weight"</code>: since all weights are set to 1,
-one QTL is arbitrarily selected per gene/peak</li>
-<li><code>weight = 1</code> for all QTLs (effect size not informative
-when using top QTL only)</li>
-</ul></li>
-</ol>
-<div id="summary-of-weight-files" class="section level2">
-<h2>Summary of weight files</h2>
-<table>
-<caption>Weight files summary (after p_eigen &lt; fdr_thresh filtering
-and b38 mapping)</caption>
-<thead>
-<tr class="header">
-<th align="left">Type</th>
-<th align="left">Condition</th>
-<th align="right">Genes/Peaks</th>
-<th align="right">Unique SNPs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">caQTL</td>
-<td align="left">IFNg</td>
-<td align="right">17097</td>
-<td align="right">16104</td>
-</tr>
-<tr class="even">
-<td align="left">caQTL</td>
-<td align="left">IFNg_SL1344</td>
-<td align="right">9254</td>
-<td align="right">8944</td>
-</tr>
-<tr class="odd">
-<td align="left">caQTL</td>
-<td align="left">SL1344</td>
-<td align="right">10794</td>
-<td align="right">10382</td>
-</tr>
-<tr class="even">
-<td align="left">caQTL</td>
-<td align="left">naive</td>
-<td align="right">16402</td>
-<td align="right">15402</td>
-</tr>
-<tr class="odd">
-<td align="left">eQTL</td>
-<td align="left">IFNg</td>
-<td align="right">2691</td>
-<td align="right">2673</td>
-</tr>
-<tr class="even">
-<td align="left">eQTL</td>
-<td align="left">IFNg_SL1344</td>
-<td align="right">2111</td>
-<td align="right">2087</td>
-</tr>
-<tr class="odd">
-<td align="left">eQTL</td>
-<td align="left">SL1344</td>
-<td align="right">2107</td>
-<td align="right">2084</td>
-</tr>
-<tr class="even">
-<td align="left">eQTL</td>
-<td align="left">naive</td>
-<td align="right">2730</td>
-<td align="right">2703</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="number-of-genespeaks-per-weight-file" class="section level2">
-<h2>Number of genes/peaks per weight file</h2>
-<p><img src="figure/weights_prepare.Rmd/count_barplot-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-count_barplot-1">
-Past versions of count_barplot-1.png
-</button>
-</p>
-<div id="fig-count_barplot-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/xsun1229/AD_analysis/blob/9bc6f4a208dce56051825d745e023710e54dea5d/docs/figure/weights_prepare.Rmd/count_barplot-1.png" target="_blank">9bc6f4a</a>
-</td>
-<td>
-XSun
-</td>
-<td>
-2026-06-18
-</td>
-</tr>
-</tbody>
-</table>
+<div id="heritability-pie-chart" class="section level2">
+<h2>Heritability Pie Chart</h2>
+<pre class="r"><code>pve_caQTL &lt;- data.frame(
+  category = names(ctwas_param_caQTL$prop_heritability),
+  percentage = ctwas_param_caQTL$prop_heritability
+)
+pve_caQTL$label &lt;- paste0(round(pve_caQTL$percentage * 100, 1), &quot;%&quot;)
+
+ggplot(pve_caQTL, aes(x = &quot;&quot;, y = percentage, fill = category)) +
+  geom_bar(stat = &quot;identity&quot;, width = 1) +
+  coord_polar(&quot;y&quot;, start = 0) +
+  theme_void() +
+  geom_text(aes(label = label),
+            position = position_stack(vjust = 0.5), size = 4) +
+  labs(fill = &quot;Group&quot;, title = &quot;caQTL-Percent of Heritability (PVE)&quot;)</code></pre>
+<p><img src="figure/ctwas_Bellenguez.Rmd/caQTL-piechart-1.png" width="576" style="display: block; margin: auto;" /></p>
 </div>
 </div>
+<div id="eqtl" class="section level1">
+<h1>eQTL</h1>
+<pre class="r"><code>param_eQTL &lt;- readRDS(file.path(outputdir, &quot;eQTL&quot;, &quot;AD.eQTL.param.shared_all.RDS&quot;))</code></pre>
+<div id="convergence-1" class="section level2">
+<h2>Convergence</h2>
+<pre class="r"><code>make_convergence_plots(param_eQTL, gwas_n)</code></pre>
+<p><img src="figure/ctwas_Bellenguez.Rmd/eQTL-convergence-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="parameters-and-enrichment-1" class="section level2">
+<h2>Parameters and Enrichment</h2>
+<pre class="r"><code>ctwas_param_eQTL &lt;- summarize_param(param_eQTL, gwas_n, enrichment_test = &quot;fisher&quot;)
+ctwas_param_eQTL</code></pre>
+<pre><code>$group_size
+ naive|eQTL SL1344|eQTL         SNP 
+       2128        1597     6661044 
+
+$group_prior
+  naive|eQTL  SL1344|eQTL          SNP 
+9.977313e-03 2.076335e-03 5.946195e-05 
+
+$group_prior_var
+ naive|eQTL SL1344|eQTL         SNP 
+    19.7651     19.7651     19.7651 
+
+$log_enrichment
+ naive|eQTL SL1344|eQTL 
+   5.122733    3.553023 
+
+$log_enrichment_se
+ naive|eQTL SL1344|eQTL 
+  0.2217070   0.5508857 
+
+$enrichment_pval
+  naive|eQTL  SL1344|eQTL 
+4.744957e-39 1.352627e-04 
+
+$group_pve
+  naive|eQTL  SL1344|eQTL          SNP 
+0.0008607950 0.0001344364 0.0160581665 
+
+$total_pve
+[1] 0.0170534
+
+$prop_heritability
+ naive|eQTL SL1344|eQTL         SNP 
+0.050476451 0.007883261 0.941640289 </code></pre>
+</div>
+<div id="heritability-pie-chart-1" class="section level2">
+<h2>Heritability Pie Chart</h2>
+<pre class="r"><code>pve_eQTL &lt;- data.frame(
+  category = names(ctwas_param_eQTL$prop_heritability),
+  percentage = ctwas_param_eQTL$prop_heritability
+)
+pve_eQTL$label &lt;- paste0(round(pve_eQTL$percentage * 100, 1), &quot;%&quot;)
+
+ggplot(pve_eQTL, aes(x = &quot;&quot;, y = percentage, fill = category)) +
+  geom_bar(stat = &quot;identity&quot;, width = 1) +
+  coord_polar(&quot;y&quot;, start = 0) +
+  theme_void() +
+  geom_text(aes(label = label),
+            position = position_stack(vjust = 0.5), size = 4) +
+  labs(fill = &quot;Group&quot;, title = &quot;eQTL-Percent of Heritability (PVE)&quot;)</code></pre>
+<p><img src="figure/ctwas_Bellenguez.Rmd/eQTL-piechart-1.png" width="576" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -928,6 +730,7 @@ Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.2.0 (2022-04-22)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: CentOS Linux 7 (Core)
@@ -942,24 +745,74 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_4.0.3     data.table_1.14.2 RSQLite_2.3.1    
+[1] DT_0.22       ggplot2_4.0.3 ctwas_0.6.1  
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.2.0   xfun_0.41          bslib_0.3.1        vctrs_0.6.5       
- [5] generics_0.1.4     htmltools_0.5.2    yaml_2.3.5         utf8_1.2.2        
- [9] blob_1.2.3         rlang_1.1.2        R.oo_1.24.0        jquerylib_0.1.4   
-[13] later_1.3.0        pillar_1.9.0       glue_1.6.2         withr_2.5.0       
-[17] DBI_1.2.2          R.utils_2.11.0     bit64_4.0.5        RColorBrewer_1.1-3
-[21] S7_0.2.0           lifecycle_1.0.4    stringr_1.5.1      gtable_0.3.6      
-[25] workflowr_1.7.0    R.methodsS3_1.8.1  evaluate_0.15      memoise_2.0.1     
-[29] labeling_0.4.2     knitr_1.39         fastmap_1.1.0      httpuv_1.6.5      
-[33] fansi_1.0.3        highr_0.9          Rcpp_1.0.12        promises_1.2.0.1  
-[37] scales_1.4.0       cachem_1.0.6       jsonlite_1.8.0     farver_2.1.0      
-[41] fs_1.5.2           bit_4.0.4          digest_0.6.29      stringi_1.7.6     
-[45] dplyr_1.1.4        rprojroot_2.0.3    grid_4.2.0         cli_3.6.1         
-[49] tools_4.2.0        magrittr_2.0.3     sass_0.4.1         tibble_3.2.1      
-[53] dichromat_2.0-0.1  whisker_0.4        pkgconfig_2.0.3    rmarkdown_2.25    
-[57] rstudioapi_0.13    R6_2.5.1           git2r_0.30.1       compiler_4.2.0    </code></pre>
+  [1] rjson_0.2.21                ellipsis_0.3.2             
+  [3] rprojroot_2.0.3             XVector_0.36.0             
+  [5] locuszoomr_0.2.1            GenomicRanges_1.48.0       
+  [7] base64enc_0.1-3             fs_1.5.2                   
+  [9] dichromat_2.0-0.1           rstudioapi_0.13            
+ [11] farver_2.1.0                ggrepel_0.9.1              
+ [13] bit64_4.0.5                 AnnotationDbi_1.58.0       
+ [15] fansi_1.0.3                 xml2_1.3.3                 
+ [17] logging_0.10-108            codetools_0.2-18           
+ [19] cachem_1.0.6                knitr_1.39                 
+ [21] jsonlite_1.8.0              workflowr_1.7.0            
+ [23] Rsamtools_2.12.0            dbplyr_2.1.1               
+ [25] png_0.1-7                   readr_2.1.2                
+ [27] compiler_4.2.0              httr_1.4.3                 
+ [29] assertthat_0.2.1            Matrix_1.5-3               
+ [31] fastmap_1.1.0               lazyeval_0.2.2             
+ [33] cli_3.6.1                   later_1.3.0                
+ [35] htmltools_0.5.2             prettyunits_1.1.1          
+ [37] tools_4.2.0                 gtable_0.3.6               
+ [39] glue_1.6.2                  GenomeInfoDbData_1.2.8     
+ [41] dplyr_1.1.4                 rappdirs_0.3.3             
+ [43] Rcpp_1.0.12                 Biobase_2.56.0             
+ [45] jquerylib_0.1.4             vctrs_0.6.5                
+ [47] Biostrings_2.64.0           rtracklayer_1.56.0         
+ [49] xfun_0.41                   stringr_1.5.1              
+ [51] irlba_2.3.5                 lifecycle_1.0.4            
+ [53] restfulr_0.0.14             ensembldb_2.20.2           
+ [55] XML_3.99-0.14               zoo_1.8-10                 
+ [57] zlibbioc_1.42.0             scales_1.4.0               
+ [59] gggrid_0.2-0                hms_1.1.1                  
+ [61] promises_1.2.0.1            MatrixGenerics_1.8.0       
+ [63] ProtGenerics_1.28.0         parallel_4.2.0             
+ [65] SummarizedExperiment_1.26.1 AnnotationFilter_1.20.0    
+ [67] LDlinkR_1.2.3               RColorBrewer_1.1-3         
+ [69] yaml_2.3.5                  curl_4.3.2                 
+ [71] memoise_2.0.1               sass_0.4.1                 
+ [73] biomaRt_2.54.1              stringi_1.7.6              
+ [75] RSQLite_2.3.1               highr_0.9                  
+ [77] S4Vectors_0.34.0            BiocIO_1.6.0               
+ [79] GenomicFeatures_1.48.3      BiocGenerics_0.42.0        
+ [81] filelock_1.0.2              BiocParallel_1.30.3        
+ [83] repr_1.1.4                  GenomeInfoDb_1.39.9        
+ [85] rlang_1.1.2                 pkgconfig_2.0.3            
+ [87] matrixStats_0.62.0          bitops_1.0-7               
+ [89] evaluate_0.15               lattice_0.20-45            
+ [91] purrr_1.0.2                 labeling_0.4.2             
+ [93] GenomicAlignments_1.32.0    htmlwidgets_1.5.4          
+ [95] cowplot_1.1.1               bit_4.0.4                  
+ [97] tidyselect_1.2.0            magrittr_2.0.3             
+ [99] AMR_2.1.1                   R6_2.5.1                   
+[101] IRanges_2.30.0              generics_0.1.4             
+[103] DelayedArray_0.22.0         DBI_1.2.2                  
+[105] withr_2.5.0                 pillar_1.9.0               
+[107] mixsqp_0.3-43               KEGGREST_1.36.3            
+[109] RCurl_1.98-1.7              tibble_3.2.1               
+[111] crayon_1.5.1                utf8_1.2.2                 
+[113] BiocFileCache_2.4.0         plotly_4.10.0              
+[115] tzdb_0.4.0                  rmarkdown_2.25             
+[117] progress_1.2.2              grid_4.2.0                 
+[119] data.table_1.14.2           blob_1.2.3                 
+[121] git2r_0.30.1                S7_0.2.0                   
+[123] digest_0.6.29               tidyr_1.3.0                
+[125] httpuv_1.6.5                stats4_4.2.0               
+[127] viridisLite_0.4.0           skimr_2.1.4                
+[129] bslib_0.3.1                </code></pre>
 </div>
 </div>
 </div>

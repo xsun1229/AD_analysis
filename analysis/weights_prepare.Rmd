@@ -8,31 +8,26 @@ output:
     toc: true
 ---
 
-## Data source
+# Data source
 
-QTL data from [Alasoo et al. 2018 (PMID 29379200)](https://pubmed.ncbi.nlm.nih.gov/29379200/), which mapped eQTLs and caQTLs (chromatin accessibility QTLs) in macrophages across 4 stimulation conditions: naive, SL1344, IFNg, and IFNg_SL1344.
+QTL data from [Alasoo et al. 2018 (PMID 29379200)](https://pubmed.ncbi.nlm.nih.gov/29379200/), which mapped eQTLs and caQTLs in macrophages across 4 stimulation conditions: naive, SL1344, IFNg, and IFNg_SL1344.
 
-Storaged in `/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200`
+Input files: `{e,ca}QTL_{condition}_RASQUAL_lead_only.txt.gz` — lead QTLs per gene/peak from RASQUAL.
 
-Input files: `{e,ca}QTL_{condition}_FastQTL_lead_only.txt.gz` — lead QTLs per gene/peak from FastQTL.
+# Multiple testing correction (from the paper)
 
-## How prediction weights were created
+The paper applies two layers of multiple testing correction:
 
-1. **Variant mapping**: rsIDs in the QTL files were mapped to b38 coordinates using the UKB LD reference variant info file (`/project2/compbio/UKB_LD_REF/ref_snp_info/ukb_b38_0.1_var_info.Rvar.gz`). This provides chrom, pos, ref, alt alleles for each rsID, used to construct `varID` in the format `chr{chrom}_{pos}_{ref}_{alt}_b38`.
+1. **Step 1 — Correcting for multiple variants per gene (cis-window)**: Used EigenMT to estimate the number of independent tests in each gene's cis-window (±500kb). This gives:
+   - `p_eigen`: nominal p-value corrected for the number of independent tests
+   - `n_tests`: number of independent tests EigenMT estimated
 
-2. **Weight creation**: Used `ctwas::create_predictdb_from_QTLs()` with:
-   - `use_top_QTL = TRUE`: one QTL per gene/peak
-   - `select_by = "weight"`: top QTL chosen by largest absolute effect size (slope)
-   - `weight` = slope from FastQTL output
-   - For eQTL files: `gene_table` includes gene name and gene_type = "protein_coding"
-   - For caQTL files: no `gene_table` (peak IDs used directly)
+2. **Step 2 — Correcting across genes**: Used Benjamini-Hochberg FDR on the EigenMT-corrected p-values. This gives:
+   - `fdr_thresh`: the empirical FDR threshold — QTLs where `p_eigen < fdr_thresh` are significant
 
-3. **Output**: PredictDB format `.db` (SQLite) + `.txt.gz` (covariance) files in `weights/` directory.
+The paper reports "up to 3,431 genes (eQTLs) and 20,788 chromatin regions (caQTLs)" at 10% FDR. These numbers come from RASQUAL with `p_eigen < fdr_thresh`, which we reproduce exactly here.
 
-4. **Mapping rate**: ~78% of caQTL SNPs and ~76% of eQTL SNPs were mapped to the UKB b38 reference. Unmapped SNPs include non-rsID variants (chr_pos format, ~1% of total) and rare variants absent from the UKB reference.
-
-5. **Gene type annotation**: For eQTL weight files, gene biotype (e.g. protein_coding, ncRNA) was annotated using `org.Hs.eg.db` based on Ensembl gene IDs, rather than assuming all genes are protein-coding. Genes not found in the database are labeled as "unknown".
-
+# Data overview
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 10, fig.height = 6)
@@ -40,9 +35,53 @@ library(RSQLite)
 library(data.table)
 library(ggplot2)
 
-weightdir <- "/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/weights"
-db_files <- list.files(weightdir, pattern = "\\.db$", full.names = TRUE)
+datadir <- "/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200"
+rasqual_dir <- file.path(datadir, "RASQUAL")
+```
 
+```{r load_raw_data}
+qtl_files <- list.files(rasqual_dir, pattern = "^(e|ca)QTL_.*_RASQUAL_lead_only\\.txt\\.gz$",
+                        full.names = TRUE)
+
+raw_list <- lapply(qtl_files, function(f) {
+  qtl <- fread(f)
+  fname <- basename(f)
+  parts <- strsplit(gsub("_RASQUAL_lead_only\\.txt\\.gz$", "", fname), "_")[[1]]
+  qtl[, qtl_type := parts[1]]
+  qtl[, condition := paste(parts[-1], collapse = "_")]
+  qtl[, label := paste(qtl_type, condition, sep = " - ")]
+  qtl[, significant := p_eigen < fdr_thresh]
+  qtl
+})
+raw_data <- rbindlist(raw_list, fill = TRUE)
+```
+
+```{r data_overview_table}
+overview <- raw_data[, .(
+  `Total genes/peaks` = .N,
+  `Unique SNPs` = uniqueN(snp_id),
+  `fdr_thresh` = round(fdr_thresh[1], 4),
+  `Significant (p_eigen < fdr_thresh)` = sum(significant),
+  `Median chisq` = round(median(chisq), 2),
+  `Max chisq` = round(max(chisq), 2)
+), by = .(Type = qtl_type, Condition = condition)]
+
+knitr::kable(overview, caption = "Input RASQUAL QTL data overview")
+```
+
+# Creating prediction models
+
+1. **Significance filtering**: Only genes/peaks with `p_eigen < fdr_thresh` were retained (matching the paper's method).
+
+2. **Variant mapping**: rsIDs were mapped to b38 coordinates using the UKB LD reference variant info file (`/project2/compbio/UKB_LD_REF/ref_snp_info/ukb_b38_0.1_var_info.Rvar.gz`), constructing `varID` in the format `chr{chrom}_{pos}_{ref}_{alt}_b38`.
+
+3. **Weight creation**: Used `ctwas::create_predictdb_from_QTLs()` with:
+   - `use_top_QTL = TRUE`: one QTL per gene/peak
+   - `select_by = "weight"`: since all weights are set to 1, one QTL is arbitrarily selected per gene/peak
+   - `weight = 1` for all QTLs (effect size not informative when using top QTL only)
+
+
+```{r load_weights}
 read_db <- function(dbfile) {
   con <- dbConnect(SQLite(), dbfile)
   w <- as.data.table(dbReadTable(con, "weights"))
@@ -54,53 +93,29 @@ read_db <- function(dbfile) {
   w[, qtl_type := parts[1]]
   w[, condition := paste(parts[-c(1, length(parts))], collapse = "_")]
   w[, file_name := name]
-
   w[, chr := as.integer(gsub("chr", "", sub("_.*", "", varID)))]
 
   if (nrow(e) > 0) {
-    w <- merge(w, e[, .(gene, genename, gene_type)], by = "gene", all.x = TRUE)
+    w <- merge(w, e, by = "gene", all.x = TRUE)
   }
   w
 }
 
+weightdir <- file.path(datadir, "RASQUAL", "weights_rasqual")
+db_files <- list.files(weightdir, pattern = "\\.db$", full.names = TRUE)
 all_weights <- rbindlist(lapply(db_files, read_db), fill = TRUE)
 all_weights[, label := paste(qtl_type, condition, sep = " - ")]
 ```
 
-## Overview
+## Summary of weight files
 
 ```{r summary_table}
 summary_dt <- all_weights[, .(
   `Genes/Peaks` = uniqueN(gene),
-  `Unique SNPs` = uniqueN(rsid),
-  `Median |weight|` = round(median(abs(weight)), 4),
-  `Max |weight|` = round(max(abs(weight)), 4)
+  `Unique SNPs` = uniqueN(rsid)
 ), by = .(Type = qtl_type, Condition = condition)]
 
-knitr::kable(summary_dt)
-```
-
-## Gene type breakdown (eQTL only)
-
-```{r gene_type_table}
-eqtl_data <- all_weights[qtl_type == "eQTL" & !is.na(gene_type)]
-if (nrow(eqtl_data) > 0) {
-  type_summary <- eqtl_data[, .(n = uniqueN(gene)), by = .(condition, gene_type)]
-  type_wide <- dcast(type_summary, gene_type ~ condition, value.var = "n", fill = 0)
-  knitr::kable(type_wide, caption = "Number of genes by biotype and condition")
-}
-```
-
-```{r gene_type_barplot, fig.height=5}
-if (nrow(eqtl_data) > 0) {
-  type_counts <- eqtl_data[, .(n = uniqueN(gene)), by = .(label, gene_type)]
-  ggplot(type_counts, aes(x = reorder(gene_type, -n), y = n, fill = gene_type)) +
-    geom_col() +
-    facet_wrap(~ label, ncol = 2) +
-    labs(x = "Gene type", y = "Count", title = "Gene biotype distribution (eQTL)") +
-    theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
-}
+knitr::kable(summary_dt, caption = "Weight files summary (after p_eigen < fdr_thresh filtering and b38 mapping)")
 ```
 
 ## Number of genes/peaks per weight file
@@ -118,106 +133,3 @@ ggplot(count_dt, aes(x = reorder(label, n), y = n, fill = qtl_type)) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.15)))
 ```
 
-## Distribution of weights
-
-```{r weight_dist, fig.height=7}
-ggplot(all_weights, aes(x = weight)) +
-  geom_histogram(bins = 50, fill = "steelblue", color = "white") +
-  facet_wrap(~ label, scales = "free_y", ncol = 2) +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
-  labs(x = "Weight (slope)", y = "Count", title = "Distribution of weights") +
-  theme_bw()
-```
-
-## Distribution of |weight|
-
-```{r absweight_dist, fig.height=7}
-ggplot(all_weights, aes(x = abs(weight))) +
-  geom_histogram(bins = 50, fill = "darkorange", color = "white") +
-  facet_wrap(~ label, scales = "free", ncol = 2) +
-  labs(x = "|Weight|", y = "Count", title = "Distribution of absolute weights") +
-  theme_bw()
-```
-
-## Chromosome distribution
-
-```{r chr_dist, fig.height=7}
-chr_counts <- all_weights[, .(n = .N), by = .(label, chr, qtl_type)]
-
-ggplot(chr_counts, aes(x = factor(chr), y = n, fill = qtl_type)) +
-  geom_col() +
-  facet_wrap(~ label, scales = "free_y", ncol = 2) +
-  labs(x = "Chromosome", y = "Count", title = "Genes/peaks per chromosome") +
-  theme_bw() +
-  theme(legend.position = "none", axis.text.x = element_text(size = 7))
-```
-
-## Overlap of genes/peaks across conditions
-
-```{r overlap_eqtl, fig.height=5}
-calc_overlap <- function(dt) {
-  conditions <- unique(dt$condition)
-  gene_lists <- lapply(conditions, function(c) unique(dt[condition == c, gene]))
-  names(gene_lists) <- conditions
-
-  n <- length(conditions)
-  mat <- matrix(0, n, n, dimnames = list(conditions, conditions))
-  for (i in seq_len(n)) {
-    for (j in seq_len(n)) {
-      mat[i, j] <- length(intersect(gene_lists[[i]], gene_lists[[j]]))
-    }
-  }
-  mat
-}
-
-eqtl_overlap <- calc_overlap(all_weights[qtl_type == "eQTL"])
-caqtl_overlap <- calc_overlap(all_weights[qtl_type == "caQTL"])
-
-knitr::kable(eqtl_overlap, caption = "eQTL: gene overlap across conditions")
-```
-
-```{r overlap_caqtl}
-knitr::kable(caqtl_overlap, caption = "caQTL: peak overlap across conditions")
-```
-
-## Weight comparison across conditions (eQTL)
-
-```{r weight_compare_eqtl, fig.height=8}
-eqtl_wide <- dcast(all_weights[qtl_type == "eQTL"], gene ~ condition, value.var = "weight")
-conditions <- unique(all_weights[qtl_type == "eQTL", condition])
-
-if (length(conditions) >= 2) {
-  pairs <- combn(conditions, 2, simplify = FALSE)
-  plots <- lapply(pairs, function(p) {
-    tmp <- eqtl_wide[!is.na(get(p[1])) & !is.na(get(p[2]))]
-    r <- round(cor(tmp[[p[1]]], tmp[[p[2]]], use = "complete.obs"), 3)
-    ggplot(tmp, aes(x = .data[[p[1]]], y = .data[[p[2]]])) +
-      geom_point(alpha = 0.3, size = 0.8) +
-      geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-      labs(title = paste0(p[1], " vs ", p[2], "  (r=", r, ")")) +
-      theme_bw()
-  })
-  gridExtra::grid.arrange(grobs = plots, ncol = 2)
-}
-```
-
-## Weight comparison across conditions (caQTL)
-
-```{r weight_compare_caqtl, fig.height=8}
-caqtl_wide <- dcast(all_weights[qtl_type == "caQTL"], gene ~ condition, value.var = "weight")
-conditions_ca <- unique(all_weights[qtl_type == "caQTL", condition])
-
-if (length(conditions_ca) >= 2) {
-  pairs <- combn(conditions_ca, 2, simplify = FALSE)
-  plots <- lapply(pairs, function(p) {
-    tmp <- caqtl_wide[!is.na(get(p[1])) & !is.na(get(p[2]))]
-    r <- round(cor(tmp[[p[1]]], tmp[[p[2]]], use = "complete.obs"), 3)
-    ggplot(tmp, aes(x = .data[[p[1]]], y = .data[[p[2]]])) +
-      geom_point(alpha = 0.3, size = 0.8) +
-      geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-      labs(title = paste0(p[1], " vs ", p[2], "  (r=", r, ")")) +
-      theme_bw()
-  })
-  gridExtra::grid.arrange(grobs = plots, ncol = 2)
-}
-```
