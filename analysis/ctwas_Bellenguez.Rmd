@@ -10,6 +10,7 @@ output:
 
 We ran the multi-group ctwas with parameters: L=5, shared_all, thin=1
 
+The GWAS we used: https://pubmed.ncbi.nlm.nih.gov/35379992/
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
