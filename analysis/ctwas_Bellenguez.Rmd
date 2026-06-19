@@ -16,10 +16,131 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(ctwas)
 library(ggplot2)
 library(DT)
+library(ggrepel)
+library(dplyr)
 
 gwas_n <- 487511
 outputdir <- "/project/xinhe/xsun/AD_jubao/3.ctwas/output"
 qtl_types <- c("caQTL", "eQTL")
+
+plot_piechart_topn <- function(ctwas_parameters, colors, by, title, n_tissue = 5) {
+  data <- data.frame(
+    category = names(ctwas_parameters$prop_heritability),
+    percentage = ctwas_parameters$prop_heritability
+  )
+
+  data <- data %>%
+    mutate(
+      context = sub("\\|.*", "", category),
+      type = sub(".*\\|", "", category)
+    )
+
+  if (by == "type") {
+    data <- data %>%
+      group_by(type) %>%
+      summarize(percentage = sum(percentage)) %>%
+      mutate(category = type)
+  } else if (by == "context") {
+    data <- data %>%
+      group_by(context) %>%
+      summarize(percentage = sum(percentage)) %>%
+      mutate(category = context)
+  } else if (by == "category") {
+    data <- data %>%
+      mutate(category = ifelse(category == "SNP", "SNP", category))
+  } else {
+    stop("Invalid 'by' parameter. Use 'type', 'context', or 'category'.")
+  }
+
+  data$percentage_label <- paste0(round(data$percentage * 100, 2), "%")
+
+  if (nrow(data) > (n_tissue + 1)) {
+    data <- data %>%
+      filter(context != "SNP") %>%
+      arrange(desc(percentage)) %>%
+      mutate(rank = row_number()) %>%
+      mutate(context = ifelse(rank <= 5, context, "Other_Tissues")) %>%
+      group_by(context) %>%
+      summarise(percentage = sum(percentage), .groups = "drop") %>%
+      bind_rows(data %>% filter(context == "SNP") %>% select(context, percentage)) %>%
+      mutate(
+        category = context,
+        percentage_label = paste0(sprintf("%.2f", percentage * 100), "%")
+      ) %>%
+      arrange(desc(percentage))
+
+    sorted_levels <- data %>%
+      mutate(sort_key = case_when(
+        category == "Other_Tissues" ~ 1,
+        category == "SNP" ~ 2,
+        TRUE ~ 0
+      )) %>%
+      arrange(sort_key, desc(percentage)) %>%
+      pull(category)
+  } else {
+    sorted_levels <- data %>%
+      arrange((category == "SNP"), desc(percentage)) %>%
+      pull(category)
+  }
+
+  data$category <- factor(data$category, levels = sorted_levels)
+
+  data <- data %>%
+    arrange(category) %>%
+    mutate(
+      cumulative = cumsum(percentage),
+      midpoint = cumulative - percentage / 2
+    )
+
+  categories <- levels(data$category)
+  has_snp <- "SNP" %in% categories
+  other_cats <- setdiff(categories, "SNP")
+
+  color_vec <- c()
+  if (has_snp) {
+    color_vec["SNP"] <- "#fbf6ef"
+  }
+
+  if (length(other_cats) > 0) {
+    if (is.null(names(colors))) {
+      colors_other <- rep(colors, length.out = length(other_cats))
+      color_vec <- c(color_vec, setNames(colors_other, other_cats))
+    } else {
+      for (cat in other_cats) {
+        color_vec[cat] <- ifelse(cat %in% names(colors), colors[cat], "#c9cba3")
+      }
+    }
+  }
+
+  data <- data %>%
+    mutate(
+      y_pos = midpoint,
+      angle = 0,
+      left_side = midpoint > 0.5,
+      hjust = ifelse(left_side, 1, 0)
+    )
+
+  pie <- ggplot(data, aes(x = "", y = percentage, fill = category)) +
+    geom_bar(stat = "identity", width = 1) +
+    coord_polar("y", start = 0) +
+    theme_void() +
+    geom_text_repel(
+      aes(y = 1 - y_pos, label = percentage_label, angle = angle),
+      size = 3,
+      nudge_x = 0.8,
+      segment.size = 0.3,
+      segment.color = "gray40",
+      box.padding = 0.2,
+      min.segment.length = 0.1,
+      hjust = 0.5,
+      vjust = 0.5
+    ) +
+    scale_fill_manual(values = color_vec) +
+    labs(fill = "") +
+    ggtitle(title)
+
+  return(pie)
+}
 ```
 
 # caQTL
@@ -43,20 +164,11 @@ ctwas_param_caQTL
 
 ## Heritability Pie Chart
 
-```{r caQTL-piechart, fig.width=6, fig.height=5}
-pve_caQTL <- data.frame(
-  category = names(ctwas_param_caQTL$prop_heritability),
-  percentage = ctwas_param_caQTL$prop_heritability
-)
-pve_caQTL$label <- paste0(round(pve_caQTL$percentage * 100, 1), "%")
-
-ggplot(pve_caQTL, aes(x = "", y = percentage, fill = category)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y", start = 0) +
-  theme_void() +
-  geom_text(aes(label = label),
-            position = position_stack(vjust = 0.5), size = 4) +
-  labs(fill = "Group", title = "caQTL-Percent of Heritability (PVE)")
+```{r caQTL-piechart, fig.width=7, fig.height=5}
+plot_piechart_topn(ctwas_param_caQTL,
+                   colors = c("#E69F00", "#56B4E9"),
+                   by = "category",
+                   title = "caQTL - Percent of Heritability (PVE)")
 ```
 
 # eQTL
@@ -80,18 +192,9 @@ ctwas_param_eQTL
 
 ## Heritability Pie Chart
 
-```{r eQTL-piechart, fig.width=6, fig.height=5}
-pve_eQTL <- data.frame(
-  category = names(ctwas_param_eQTL$prop_heritability),
-  percentage = ctwas_param_eQTL$prop_heritability
-)
-pve_eQTL$label <- paste0(round(pve_eQTL$percentage * 100, 1), "%")
-
-ggplot(pve_eQTL, aes(x = "", y = percentage, fill = category)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y", start = 0) +
-  theme_void() +
-  geom_text(aes(label = label),
-            position = position_stack(vjust = 0.5), size = 4) +
-  labs(fill = "Group", title = "eQTL-Percent of Heritability (PVE)")
+```{r eQTL-piechart, fig.width=7, fig.height=5}
+plot_piechart_topn(ctwas_param_eQTL,
+                   colors = c("#E69F00", "#56B4E9"),
+                   by = "category",
+                   title = "eQTL - Percent of Heritability (PVE)")
 ```
