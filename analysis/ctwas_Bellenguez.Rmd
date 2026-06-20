@@ -8,10 +8,6 @@ output:
     toc: true
 ---
 
-We ran the multi-group ctwas with parameters: L=5, shared_all, thin=1
-
-The GWAS we used: https://pubmed.ncbi.nlm.nih.gov/35379992/
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(ctwas)
@@ -19,6 +15,10 @@ library(ggplot2)
 library(DT)
 library(ggrepel)
 library(dplyr)
+library(RSQLite)
+library(VennDiagram)
+library(grid)
+library(EnsDb.Hsapiens.v86)
 
 gwas_n <- 487511
 outputdir <- "/project/xinhe/xsun/AD_jubao/3.ctwas/output"
@@ -144,26 +144,91 @@ plot_piechart_topn <- function(ctwas_parameters, colors, by, title, n_tissue = 5
 }
 ```
 
-# caQTL
+
+# Analysis details
+
+The cTWAS analysis was performed using `run_ctwas.R` located at `/project/xinhe/xsun/AD_jubao/3.ctwas/run_ctwas.R`.
+
+**Key steps:**
+
+1. **GWAS preprocessing**: GWAS summary statistics from [Bellenguez et al. 2022](https://pubmed.ncbi.nlm.nih.gov/35379992/) were read and preprocessed with `read_gwas()` and `preprocess_z_snp()` (dropping multi-allelic and strand-ambiguous variants).
+2. **Weight preprocessing**: Prediction weights (PredictDB format, RASQUAL-based) were preprocessed with `preprocess_weights()` for each condition (naive, SL1344). For eQTL, protein-coding gene filtering was applied; for caQTL it was not.
+3. **Gene z-score computation**: Gene-level z-scores were computed with `compute_gene_z()`.
+4. **Region data assembly**: Region data was assembled with `assemble_region_data()` using `thin = 1` and `adjust_boundary_genes = TRUE`.
+5. **Parameter estimation**: Parameters were estimated with `est_param()` using `group_prior_var_structure = "shared_all"`, `null_method = "ctwas"`, `niter_prefit = 3`, `niter = 30`, `min_gene = 1`, `min_var = 2`, `min_p_single_effect = 0.8`.
+6. **Fine-mapping**: Fine-mapping was performed with `finemap_regions()` using `L = 5` and `null_method = "ctwas"`.
+
+**LD reference**: UK Biobank LD reference (b38) stored at `/project2/compbio/UKB_LD_REF/UKB_LDR_0.1_b38/`.
+
+**Weight files** (RASQUAL-based):
+
+- caQTL: `caQTL_naive_RASQUAL.db`, `caQTL_SL1344_RASQUAL.db`
+- eQTL: `eQTL_naive_RASQUAL.db`, `eQTL_SL1344_RASQUAL.db`
+
+# Peaks used in weights
+
+## caQTL
+
+We compare the ATAC peaks present in the naive and SL1344 caQTL weight databases.
+
+```{r caQTL-peaks, fig.width=6, fig.height=5}
+weight_dir <- "/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/RASQUAL/weights_rasqual"
+
+db_naive <- dbConnect(SQLite(), file.path(weight_dir, "caQTL_naive_RASQUAL.db"))
+peaks_naive <- dbGetQuery(db_naive, "SELECT gene FROM extra")$gene
+dbDisconnect(db_naive)
+
+db_sl <- dbConnect(SQLite(), file.path(weight_dir, "caQTL_SL1344_RASQUAL.db"))
+peaks_sl <- dbGetQuery(db_sl, "SELECT gene FROM extra")$gene
+dbDisconnect(db_sl)
+
+n_naive <- length(peaks_naive)
+n_sl <- length(peaks_sl)
+n_shared <- length(intersect(peaks_naive, peaks_sl))
+n_total <- length(union(peaks_naive, peaks_sl))
+
+grid.newpage()
+draw.pairwise.venn(
+  area1 = n_naive,
+  area2 = n_sl,
+  cross.area = n_shared,
+  category = c("Naive", "SL1344"),
+  scaled = TRUE,
+  fill = c("#E69F00", "#56B4E9"),
+  alpha = 0.5,
+  cat.pos = c(-20, 20),
+  cat.dist = 0.05,
+  cat.cex = 1.2,
+  cex = 1.1,
+  label.col = "black",
+  ext.text = FALSE,
+  print.mode = c("raw", "percent")
+)
+grid.text("caQTL: Peaks in Weight Databases", y = 0.95, gp = gpar(fontsize = 14))
+```
+
+# cTWAS results
+
+## caQTL
 
 ```{r caQTL-load}
 param_caQTL <- readRDS(file.path(outputdir, "caQTL", "AD.caQTL.param.shared_all.RDS"))
 ```
 
-## Convergence
+### Convergence
 
 ```{r caQTL-convergence, fig.width=10, fig.height=6}
 make_convergence_plots(param_caQTL, gwas_n)
 ```
 
-## Parameters and Enrichment
+### Parameters and Enrichment
 
 ```{r caQTL-param}
 ctwas_param_caQTL <- summarize_param(param_caQTL, gwas_n, enrichment_test = "fisher")
 ctwas_param_caQTL
 ```
 
-## Heritability Pie Chart
+### Heritability Pie Chart
 
 ```{r caQTL-piechart, fig.width=7, fig.height=5}
 plot_piechart_topn(ctwas_param_caQTL,
@@ -172,26 +237,100 @@ plot_piechart_topn(ctwas_param_caQTL,
                    title = "caQTL - Percent of Heritability (PVE)")
 ```
 
-# eQTL
+### Fine-mapping results (PIP > 0.8)
+
+```{r caQTL-finemap}
+finemap_caQTL <- readRDS(file.path(outputdir, "caQTL",
+                         "AD.caQTL.shared_all.L5.finemap_regions_res.RDS"))
+fm_caQTL <- finemap_caQTL$finemap_res
+
+peaks_high_pip <- fm_caQTL[fm_caQTL$type != "SNP" & fm_caQTL$susie_pip > 0.8, ]
+peaks_high_pip <- peaks_high_pip[order(-peaks_high_pip$susie_pip), ]
+```
+
+**`r nrow(peaks_high_pip)` peaks** with PIP > 0.8:
+
+```{r caQTL-finemap-table}
+if (nrow(peaks_high_pip) > 0) {
+  datatable(peaks_high_pip,
+            caption = "caQTL peaks with PIP > 0.8",
+            options = list(pageLength = 20, scrollX = TRUE))
+} else {
+  cat("No peaks found with PIP > 0.8.")
+}
+```
+
+### Locus zoom plots
+
+Locus zoom plots for regions containing ATAC peaks with PIP > 0.8.
+
+```{r caQTL-locusplot-prep}
+ens_db <- EnsDb.Hsapiens.v86
+weights_caQTL <- readRDS(file.path(outputdir, "caQTL", "AD.caQTL.preprocessed.weights.RDS"))
+snp_map <- readRDS("/project2/xinhe/shared_data/multigroup_ctwas/LD_region_info/snp_map.RDS")
+mapping_table_caQTL <- readRDS("/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/ATAC_peak_mapping.RDS")
+
+fm_caQTL_anno <- fm_caQTL
+fm_caQTL_anno$pval <- z2p(fm_caQTL_anno$z)
+
+fm_caQTL_anno <- anno_finemap_res(fm_caQTL_anno,
+                                  snp_map = snp_map,
+                                  mapping_table = mapping_table_caQTL,
+                                  add_gene_annot = TRUE,
+                                  map_by = "molecular_id",
+                                  drop_unmapped = TRUE,
+                                  add_position = TRUE,
+                                  use_gene_pos = "mid")
+
+top_regions_caQTL <- unique(fm_caQTL_anno$region_id[fm_caQTL_anno$group != "SNP" & fm_caQTL_anno$susie_pip > 0.8])
+```
+
+```{r caQTL-locusplots, fig.width=10, fig.height=8, results='asis'}
+for (region_id in top_regions_caQTL) {
+  cat(sprintf("\n#### Region: %s\n\n", region_id))
+
+  print(make_locusplot(
+    fm_caQTL_anno,
+    region_id = region_id,
+    ens_db = ens_db,
+    weights = weights_caQTL,
+    highlight_pip = 0.8,
+    filter_protein_coding_genes = FALSE,
+    filter_cs = TRUE,
+    color_pval_by = "cs",
+    color_pip_by = "cs",
+    panel.heights = c(4, 4, 1, 4)
+  ))
+
+  cat("\n\n")
+}
+```
+
+
+
+
+
+
+## eQTL
 
 ```{r eQTL-load}
 param_eQTL <- readRDS(file.path(outputdir, "eQTL", "AD.eQTL.param.shared_all.RDS"))
 ```
 
-## Convergence
+### Convergence
 
 ```{r eQTL-convergence, fig.width=10, fig.height=6}
 make_convergence_plots(param_eQTL, gwas_n)
 ```
 
-## Parameters and Enrichment
+### Parameters and Enrichment
 
 ```{r eQTL-param}
 ctwas_param_eQTL <- summarize_param(param_eQTL, gwas_n, enrichment_test = "fisher")
 ctwas_param_eQTL
 ```
 
-## Heritability Pie Chart
+### Heritability Pie Chart
 
 ```{r eQTL-piechart, fig.width=7, fig.height=5}
 plot_piechart_topn(ctwas_param_eQTL,

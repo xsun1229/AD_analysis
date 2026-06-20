@@ -38,6 +38,14 @@
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.22/datatables.js"></script>
+<link href="site_libs/dt-core-1.11.3/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.11.3/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.11.3/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -529,15 +537,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ADanalysistreeb0369d6bcfe565a0171b8855de94d4b9ba474061targetblankb0369d6a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ADanalysistree1fb2cf3294ddb11fb6e791348c9268ec2b7af328targetblank1fb2cf3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xsun1229/AD_analysis/tree/b0369d6bcfe565a0171b8855de94d4b9ba474061" target="_blank">b0369d6</a>
+<a href="https://github.com/xsun1229/AD_analysis/tree/1fb2cf3294ddb11fb6e791348c9268ec2b7af328" target="_blank">1fb2cf3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ADanalysistreeb0369d6bcfe565a0171b8855de94d4b9ba474061targetblankb0369d6a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxsun1229ADanalysistree1fb2cf3294ddb11fb6e791348c9268ec2b7af328targetblank1fb2cf3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -547,7 +555,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xsun1229/AD_analysis/tree/b0369d6bcfe565a0171b8855de94d4b9ba474061" target="_blank">b0369d6</a>.
+<a href="https://github.com/xsun1229/AD_analysis/tree/1fb2cf3294ddb11fb6e791348c9268ec2b7af328" target="_blank">1fb2cf3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -608,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xsun1229/AD_analysis/blob/1fb2cf3294ddb11fb6e791348c9268ec2b7af328/analysis/ctwas_Bellenguez.Rmd" target="_blank">1fb2cf3</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-06-19
+</td>
+<td>
+update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xsun1229/AD_analysis/1fb2cf3294ddb11fb6e791348c9268ec2b7af328/docs/ctwas_Bellenguez.html" target="_blank">1fb2cf3</a>
+</td>
+<td>
+XSun
+</td>
+<td>
+2026-06-19
+</td>
+<td>
+update
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -683,15 +725,98 @@ update
 </div>
 </div>
 </div>
-<p>We ran the multi-group ctwas with parameters: L=5, shared_all,
-thin=1</p>
-<p>The GWAS we used: <a href="https://pubmed.ncbi.nlm.nih.gov/35379992/"
-class="uri">https://pubmed.ncbi.nlm.nih.gov/35379992/</a></p>
-<div id="caqtl" class="section level1">
-<h1>caQTL</h1>
+<div id="analysis-details" class="section level1">
+<h1>Analysis details</h1>
+<p>The cTWAS analysis was performed using <code>run_ctwas.R</code>
+located at
+<code>/project/xinhe/xsun/AD_jubao/3.ctwas/run_ctwas.R</code>.</p>
+<p><strong>Key steps:</strong></p>
+<ol style="list-style-type: decimal">
+<li><strong>GWAS preprocessing</strong>: GWAS summary statistics from <a
+href="https://pubmed.ncbi.nlm.nih.gov/35379992/">Bellenguez et
+al. 2022</a> were read and preprocessed with <code>read_gwas()</code>
+and <code>preprocess_z_snp()</code> (dropping multi-allelic and
+strand-ambiguous variants).</li>
+<li><strong>Weight preprocessing</strong>: Prediction weights (PredictDB
+format, RASQUAL-based) were preprocessed with
+<code>preprocess_weights()</code> for each condition (naive, SL1344).
+For eQTL, protein-coding gene filtering was applied; for caQTL it was
+not.</li>
+<li><strong>Gene z-score computation</strong>: Gene-level z-scores were
+computed with <code>compute_gene_z()</code>.</li>
+<li><strong>Region data assembly</strong>: Region data was assembled
+with <code>assemble_region_data()</code> using <code>thin = 1</code> and
+<code>adjust_boundary_genes = TRUE</code>.</li>
+<li><strong>Parameter estimation</strong>: Parameters were estimated
+with <code>est_param()</code> using
+<code>group_prior_var_structure = "shared_all"</code>,
+<code>null_method = "ctwas"</code>, <code>niter_prefit = 3</code>,
+<code>niter = 30</code>, <code>min_gene = 1</code>,
+<code>min_var = 2</code>, <code>min_p_single_effect = 0.8</code>.</li>
+<li><strong>Fine-mapping</strong>: Fine-mapping was performed with
+<code>finemap_regions()</code> using <code>L = 5</code> and
+<code>null_method = "ctwas"</code>.</li>
+</ol>
+<p><strong>LD reference</strong>: UK Biobank LD reference (b38) stored
+at <code>/project2/compbio/UKB_LD_REF/UKB_LDR_0.1_b38/</code>.</p>
+<p><strong>Weight files</strong> (RASQUAL-based):</p>
+<ul>
+<li>caQTL: <code>caQTL_naive_RASQUAL.db</code>,
+<code>caQTL_SL1344_RASQUAL.db</code></li>
+<li>eQTL: <code>eQTL_naive_RASQUAL.db</code>,
+<code>eQTL_SL1344_RASQUAL.db</code></li>
+</ul>
+</div>
+<div id="peaks-used-in-weights" class="section level1">
+<h1>Peaks used in weights</h1>
+<div id="caqtl" class="section level2">
+<h2>caQTL</h2>
+<p>We compare the ATAC peaks present in the naive and SL1344 caQTL
+weight databases.</p>
+<pre class="r"><code>weight_dir &lt;- &quot;/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/RASQUAL/weights_rasqual&quot;
+
+db_naive &lt;- dbConnect(SQLite(), file.path(weight_dir, &quot;caQTL_naive_RASQUAL.db&quot;))
+peaks_naive &lt;- dbGetQuery(db_naive, &quot;SELECT gene FROM extra&quot;)$gene
+dbDisconnect(db_naive)
+
+db_sl &lt;- dbConnect(SQLite(), file.path(weight_dir, &quot;caQTL_SL1344_RASQUAL.db&quot;))
+peaks_sl &lt;- dbGetQuery(db_sl, &quot;SELECT gene FROM extra&quot;)$gene
+dbDisconnect(db_sl)
+
+n_naive &lt;- length(peaks_naive)
+n_sl &lt;- length(peaks_sl)
+n_shared &lt;- length(intersect(peaks_naive, peaks_sl))
+n_total &lt;- length(union(peaks_naive, peaks_sl))
+
+grid.newpage()
+draw.pairwise.venn(
+  area1 = n_naive,
+  area2 = n_sl,
+  cross.area = n_shared,
+  category = c(&quot;Naive&quot;, &quot;SL1344&quot;),
+  scaled = TRUE,
+  fill = c(&quot;#E69F00&quot;, &quot;#56B4E9&quot;),
+  alpha = 0.5,
+  cat.pos = c(-20, 20),
+  cat.dist = 0.05,
+  cat.cex = 1.2,
+  cex = 1.1,
+  label.col = &quot;black&quot;,
+  ext.text = FALSE,
+  print.mode = c(&quot;raw&quot;, &quot;percent&quot;)
+)</code></pre>
+<pre><code>(polygon[GRID.polygon.11], polygon[GRID.polygon.12], polygon[GRID.polygon.13], polygon[GRID.polygon.14], text[GRID.text.15], text[GRID.text.16], text[GRID.text.17], text[GRID.text.18], text[GRID.text.19]) </code></pre>
+<pre class="r"><code>grid.text(&quot;caQTL: Peaks in Weight Databases&quot;, y = 0.95, gp = gpar(fontsize = 14))</code></pre>
+<p><img src="figure/ctwas_Bellenguez.Rmd/caQTL-peaks-1.png" width="576" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="ctwas-results" class="section level1">
+<h1>cTWAS results</h1>
+<div id="caqtl-1" class="section level2">
+<h2>caQTL</h2>
 <pre class="r"><code>param_caQTL &lt;- readRDS(file.path(outputdir, &quot;caQTL&quot;, &quot;AD.caQTL.param.shared_all.RDS&quot;))</code></pre>
-<div id="convergence" class="section level2">
-<h2>Convergence</h2>
+<div id="convergence" class="section level3">
+<h3>Convergence</h3>
 <pre class="r"><code>make_convergence_plots(param_caQTL, gwas_n)</code></pre>
 <p><img src="figure/ctwas_Bellenguez.Rmd/caQTL-convergence-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>
@@ -732,8 +857,8 @@ XSun
 </div>
 </div>
 </div>
-<div id="parameters-and-enrichment" class="section level2">
-<h2>Parameters and Enrichment</h2>
+<div id="parameters-and-enrichment" class="section level3">
+<h3>Parameters and Enrichment</h3>
 <pre class="r"><code>ctwas_param_caQTL &lt;- summarize_param(param_caQTL, gwas_n, enrichment_test = &quot;fisher&quot;)
 ctwas_param_caQTL</code></pre>
 <pre><code>$group_size
@@ -771,8 +896,8 @@ $prop_heritability
  naive|caQTL SL1344|caQTL          SNP 
   0.05644169   0.09341741   0.85014090 </code></pre>
 </div>
-<div id="heritability-pie-chart" class="section level2">
-<h2>Heritability Pie Chart</h2>
+<div id="heritability-pie-chart" class="section level3">
+<h3>Heritability Pie Chart</h3>
 <pre class="r"><code>plot_piechart_topn(ctwas_param_caQTL,
                    colors = c(&quot;#E69F00&quot;, &quot;#56B4E9&quot;),
                    by = &quot;category&quot;,
@@ -827,12 +952,123 @@ XSun
 </div>
 </div>
 </div>
+<div id="fine-mapping-results-pip-0.8" class="section level3">
+<h3>Fine-mapping results (PIP &gt; 0.8)</h3>
+<pre class="r"><code>finemap_caQTL &lt;- readRDS(file.path(outputdir, &quot;caQTL&quot;,
+                         &quot;AD.caQTL.shared_all.L5.finemap_regions_res.RDS&quot;))
+fm_caQTL &lt;- finemap_caQTL$finemap_res
+
+peaks_high_pip &lt;- fm_caQTL[fm_caQTL$type != &quot;SNP&quot; &amp; fm_caQTL$susie_pip &gt; 0.8, ]
+peaks_high_pip &lt;- peaks_high_pip[order(-peaks_high_pip$susie_pip), ]</code></pre>
+<p><strong>4 peaks</strong> with PIP &gt; 0.8:</p>
+<pre class="r"><code>if (nrow(peaks_high_pip) &gt; 0) {
+  datatable(peaks_high_pip,
+            caption = &quot;caQTL peaks with PIP &gt; 0.8&quot;,
+            options = list(pageLength = 20, scrollX = TRUE))
+} else {
+  cat(&quot;No peaks found with PIP &gt; 0.8.&quot;)
+}</code></pre>
+<div id="htmlwidget-b1cedd8b8487012be7ae" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b1cedd8b8487012be7ae">{"x":{"filter":"none","vertical":false,"caption":"<caption>caQTL peaks with PIP &gt; 0.8<\/caption>","data":[["2811669","4301208","834149","2476583"],["ATAC_peak_244110|SL1344_caQTL","ATAC_peak_51975|naive_caQTL","ATAC_peak_147263|SL1344_caQTL","ATAC_peak_230321|naive_caQTL"],["ATAC_peak_244110","ATAC_peak_51975","ATAC_peak_147263","ATAC_peak_230321"],["caQTL","caQTL","caQTL","caQTL"],["SL1344","naive","SL1344","naive"],["SL1344|caQTL","naive|caQTL","SL1344|caQTL","naive|caQTL"],["7_7769121_9083793","11_84670229_86908259","2_158720570_160913222","6_40377376_42070983"],[-5.14772727272727,-12.5714285714286,4.37037037037037,6.7191011235955],[0.950156829990999,0.941317538647429,0.812335118780024,0.807046897743035],[-6.06642407240998,-13.6624718452124,5.87156837264606,7.75677168678023],["L1","L1",null,"L2"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>id<\/th>\n      <th>molecular_id<\/th>\n      <th>type<\/th>\n      <th>context<\/th>\n      <th>group<\/th>\n      <th>region_id<\/th>\n      <th>z<\/th>\n      <th>susie_pip<\/th>\n      <th>mu<\/th>\n      <th>cs<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":20,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[7,8,9]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,20,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="eqtl" class="section level1">
-<h1>eQTL</h1>
+<div id="locus-zoom-plots" class="section level3">
+<h3>Locus zoom plots</h3>
+<p>Locus zoom plots for regions containing ATAC peaks with PIP &gt;
+0.8.</p>
+<pre class="r"><code>ens_db &lt;- EnsDb.Hsapiens.v86
+weights_caQTL &lt;- readRDS(file.path(outputdir, &quot;caQTL&quot;, &quot;AD.caQTL.preprocessed.weights.RDS&quot;))
+snp_map &lt;- readRDS(&quot;/project2/xinhe/shared_data/multigroup_ctwas/LD_region_info/snp_map.RDS&quot;)
+mapping_table_caQTL &lt;- readRDS(&quot;/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/ATAC_peak_mapping.RDS&quot;)
+
+fm_caQTL_anno &lt;- fm_caQTL
+fm_caQTL_anno$pval &lt;- z2p(fm_caQTL_anno$z)
+
+fm_caQTL_anno &lt;- anno_finemap_res(fm_caQTL_anno,
+                                  snp_map = snp_map,
+                                  mapping_table = mapping_table_caQTL,
+                                  add_gene_annot = TRUE,
+                                  map_by = &quot;molecular_id&quot;,
+                                  drop_unmapped = TRUE,
+                                  add_position = TRUE,
+                                  use_gene_pos = &quot;mid&quot;)</code></pre>
+<pre><code>2026-06-19 21:22:55 INFO::Annotating fine-mapping result...
+2026-06-19 21:22:58 INFO::Map molecular traits to genes
+2026-06-19 21:23:26 INFO::Add gene positions
+2026-06-19 21:23:28 INFO::Add SNP positions</code></pre>
+<pre class="r"><code>top_regions_caQTL &lt;- unique(fm_caQTL_anno$region_id[fm_caQTL_anno$group != &quot;SNP&quot; &amp; fm_caQTL_anno$susie_pip &gt; 0.8])</code></pre>
+<pre class="r"><code>for (region_id in top_regions_caQTL) {
+  cat(sprintf(&quot;\n#### Region: %s\n\n&quot;, region_id))
+
+  print(make_locusplot(
+    fm_caQTL_anno,
+    region_id = region_id,
+    ens_db = ens_db,
+    weights = weights_caQTL,
+    highlight_pip = 0.8,
+    filter_protein_coding_genes = FALSE,
+    filter_cs = TRUE,
+    color_pval_by = &quot;cs&quot;,
+    color_pip_by = &quot;cs&quot;,
+    panel.heights = c(4, 4, 1, 4)
+  ))
+
+  cat(&quot;\n\n&quot;)
+}</code></pre>
+<div id="region-2_158720570_160913222" class="section level4">
+<h4>Region: 2_158720570_160913222</h4>
+<p>2026-06-19 21:23:52 <a href="INFO::focal" class="uri">INFO::focal</a>
+id: ATAC_peak_147263|SL1344_caQTL 2026-06-19 21:23:52 <a
+href="INFO::focal" class="uri">INFO::focal</a> molecular trait:
+ATAC_peak_147263 SL1344 caQTL 2026-06-19 21:23:52 <a href="INFO::Range"
+class="uri">INFO::Range</a> of locus: chr2:158720695-160913244
+2026-06-19 21:23:52 <a href="INFO::focal" class="uri">INFO::focal</a>
+molecular trait QTL positions: 160428726 2026-06-19 21:23:52 <a
+href="INFO::Limit" class="uri">INFO::Limit</a> PIPs to credible sets
+<img src="figure/ctwas_Bellenguez.Rmd/caQTL-locusplots-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="region-6_40377376_42070983" class="section level4">
+<h4>Region: 6_40377376_42070983</h4>
+<p>2026-06-19 21:23:53 <a href="INFO::focal" class="uri">INFO::focal</a>
+id: ATAC_peak_230321|naive_caQTL 2026-06-19 21:23:53 <a
+href="INFO::focal" class="uri">INFO::focal</a> molecular trait:
+ATAC_peak_230321 naive caQTL 2026-06-19 21:23:53 <a href="INFO::Range"
+class="uri">INFO::Range</a> of locus: chr6:40377740-42070811 2026-06-19
+21:23:53 <a href="INFO::focal" class="uri">INFO::focal</a> molecular
+trait QTL positions: 41186912 2026-06-19 21:23:53 <a href="INFO::Limit"
+class="uri">INFO::Limit</a> PIPs to credible sets
+<img src="figure/ctwas_Bellenguez.Rmd/caQTL-locusplots-2.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="region-7_7769121_9083793" class="section level4">
+<h4>Region: 7_7769121_9083793</h4>
+<p>2026-06-19 21:23:55 <a href="INFO::focal" class="uri">INFO::focal</a>
+id: ATAC_peak_244110|SL1344_caQTL 2026-06-19 21:23:55 <a
+href="INFO::focal" class="uri">INFO::focal</a> molecular trait:
+ATAC_peak_244110 SL1344 caQTL 2026-06-19 21:23:55 <a href="INFO::Range"
+class="uri">INFO::Range</a> of locus: chr7:7769021-9083496 2026-06-19
+21:23:56 <a href="INFO::focal" class="uri">INFO::focal</a> molecular
+trait QTL positions: 7815324 2026-06-19 21:23:56 <a href="INFO::Limit"
+class="uri">INFO::Limit</a> PIPs to credible sets
+<img src="figure/ctwas_Bellenguez.Rmd/caQTL-locusplots-3.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="region-11_84670229_86908259" class="section level4">
+<h4>Region: 11_84670229_86908259</h4>
+<p>2026-06-19 21:23:58 <a href="INFO::focal" class="uri">INFO::focal</a>
+id: ATAC_peak_51975|naive_caQTL 2026-06-19 21:23:58 <a
+href="INFO::focal" class="uri">INFO::focal</a> molecular trait:
+ATAC_peak_51975 naive caQTL 2026-06-19 21:23:58 <a href="INFO::Range"
+class="uri">INFO::Range</a> of locus: chr11:84670331-86907936 2026-06-19
+21:23:58 <a href="INFO::focal" class="uri">INFO::focal</a> molecular
+trait QTL positions: 86156833 2026-06-19 21:23:58 <a href="INFO::Limit"
+class="uri">INFO::Limit</a> PIPs to credible sets
+<img src="figure/ctwas_Bellenguez.Rmd/caQTL-locusplots-4.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</div>
+<div id="eqtl" class="section level2">
+<h2>eQTL</h2>
 <pre class="r"><code>param_eQTL &lt;- readRDS(file.path(outputdir, &quot;eQTL&quot;, &quot;AD.eQTL.param.shared_all.RDS&quot;))</code></pre>
-<div id="convergence-1" class="section level2">
-<h2>Convergence</h2>
+<div id="convergence-1" class="section level3">
+<h3>Convergence</h3>
 <pre class="r"><code>make_convergence_plots(param_eQTL, gwas_n)</code></pre>
 <p><img src="figure/ctwas_Bellenguez.Rmd/eQTL-convergence-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>
@@ -873,8 +1109,8 @@ XSun
 </div>
 </div>
 </div>
-<div id="parameters-and-enrichment-1" class="section level2">
-<h2>Parameters and Enrichment</h2>
+<div id="parameters-and-enrichment-1" class="section level3">
+<h3>Parameters and Enrichment</h3>
 <pre class="r"><code>ctwas_param_eQTL &lt;- summarize_param(param_eQTL, gwas_n, enrichment_test = &quot;fisher&quot;)
 ctwas_param_eQTL</code></pre>
 <pre><code>$group_size
@@ -912,8 +1148,8 @@ $prop_heritability
  naive|eQTL SL1344|eQTL         SNP 
 0.050476451 0.007883261 0.941640289 </code></pre>
 </div>
-<div id="heritability-pie-chart-1" class="section level2">
-<h2>Heritability Pie Chart</h2>
+<div id="heritability-pie-chart-1" class="section level3">
+<h3>Heritability Pie Chart</h3>
 <pre class="r"><code>plot_piechart_topn(ctwas_param_eQTL,
                    colors = c(&quot;#E69F00&quot;, &quot;#56B4E9&quot;),
                    by = &quot;category&quot;,
@@ -987,76 +1223,83 @@ locale:
 [1] C
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] stats4    grid      stats     graphics  grDevices utils     datasets 
+[8] methods   base     
 
 other attached packages:
-[1] dplyr_1.1.4   ggrepel_0.9.1 DT_0.22       ggplot2_4.0.3 ctwas_0.6.1  
+ [1] EnsDb.Hsapiens.v86_2.99.0 ensembldb_2.20.2         
+ [3] AnnotationFilter_1.20.0   GenomicFeatures_1.48.3   
+ [5] AnnotationDbi_1.58.0      Biobase_2.56.0           
+ [7] GenomicRanges_1.48.0      GenomeInfoDb_1.39.9      
+ [9] IRanges_2.30.0            S4Vectors_0.34.0         
+[11] BiocGenerics_0.42.0       VennDiagram_1.7.3        
+[13] futile.logger_1.4.3       RSQLite_2.3.1            
+[15] dplyr_1.1.4               ggrepel_0.9.1            
+[17] DT_0.22                   ggplot2_4.0.3            
+[19] ctwas_0.6.1              
 
 loaded via a namespace (and not attached):
   [1] rjson_0.2.21                ellipsis_0.3.2             
   [3] rprojroot_2.0.3             XVector_0.36.0             
-  [5] locuszoomr_0.2.1            GenomicRanges_1.48.0       
-  [7] base64enc_0.1-3             fs_1.5.2                   
-  [9] dichromat_2.0-0.1           rstudioapi_0.13            
- [11] farver_2.1.0                bit64_4.0.5                
- [13] AnnotationDbi_1.58.0        fansi_1.0.3                
- [15] xml2_1.3.3                  logging_0.10-108           
- [17] codetools_0.2-18            cachem_1.0.6               
- [19] knitr_1.39                  jsonlite_1.8.0             
- [21] workflowr_1.7.0             Rsamtools_2.12.0           
- [23] dbplyr_2.1.1                png_0.1-7                  
- [25] readr_2.1.2                 compiler_4.2.0             
- [27] httr_1.4.3                  assertthat_0.2.1           
- [29] Matrix_1.5-3                fastmap_1.1.0              
- [31] lazyeval_0.2.2              cli_3.6.1                  
- [33] later_1.3.0                 htmltools_0.5.2            
- [35] prettyunits_1.1.1           tools_4.2.0                
- [37] gtable_0.3.6                glue_1.6.2                 
- [39] GenomeInfoDbData_1.2.8      rappdirs_0.3.3             
- [41] Rcpp_1.0.12                 Biobase_2.56.0             
- [43] jquerylib_0.1.4             vctrs_0.6.5                
- [45] Biostrings_2.64.0           rtracklayer_1.56.0         
- [47] xfun_0.41                   stringr_1.5.1              
- [49] irlba_2.3.5                 lifecycle_1.0.4            
- [51] restfulr_0.0.14             ensembldb_2.20.2           
- [53] XML_3.99-0.14               zoo_1.8-10                 
- [55] zlibbioc_1.42.0             scales_1.4.0               
- [57] gggrid_0.2-0                hms_1.1.1                  
- [59] promises_1.2.0.1            MatrixGenerics_1.8.0       
- [61] ProtGenerics_1.28.0         parallel_4.2.0             
- [63] SummarizedExperiment_1.26.1 AnnotationFilter_1.20.0    
- [65] LDlinkR_1.2.3               RColorBrewer_1.1-3         
- [67] yaml_2.3.5                  curl_4.3.2                 
- [69] memoise_2.0.1               sass_0.4.1                 
- [71] biomaRt_2.54.1              stringi_1.7.6              
- [73] RSQLite_2.3.1               highr_0.9                  
- [75] S4Vectors_0.34.0            BiocIO_1.6.0               
- [77] GenomicFeatures_1.48.3      BiocGenerics_0.42.0        
- [79] filelock_1.0.2              BiocParallel_1.30.3        
- [81] repr_1.1.4                  GenomeInfoDb_1.39.9        
- [83] rlang_1.1.2                 pkgconfig_2.0.3            
- [85] matrixStats_0.62.0          bitops_1.0-7               
- [87] evaluate_0.15               lattice_0.20-45            
- [89] purrr_1.0.2                 labeling_0.4.2             
- [91] GenomicAlignments_1.32.0    htmlwidgets_1.5.4          
- [93] cowplot_1.1.1               bit_4.0.4                  
- [95] tidyselect_1.2.0            magrittr_2.0.3             
- [97] AMR_2.1.1                   R6_2.5.1                   
- [99] IRanges_2.30.0              generics_0.1.4             
-[101] DelayedArray_0.22.0         DBI_1.2.2                  
-[103] withr_2.5.0                 pillar_1.9.0               
-[105] whisker_0.4                 mixsqp_0.3-43              
-[107] KEGGREST_1.36.3             RCurl_1.98-1.7             
-[109] tibble_3.2.1                crayon_1.5.1               
-[111] utf8_1.2.2                  BiocFileCache_2.4.0        
-[113] plotly_4.10.0               tzdb_0.4.0                 
-[115] rmarkdown_2.25              progress_1.2.2             
-[117] grid_4.2.0                  data.table_1.14.2          
-[119] blob_1.2.3                  git2r_0.30.1               
-[121] S7_0.2.0                    digest_0.6.29              
-[123] tidyr_1.3.0                 httpuv_1.6.5               
-[125] stats4_4.2.0                viridisLite_0.4.0          
-[127] skimr_2.1.4                 bslib_0.3.1                </code></pre>
+  [5] locuszoomr_0.2.1            base64enc_0.1-3            
+  [7] fs_1.5.2                    dichromat_2.0-0.1          
+  [9] rstudioapi_0.13             farver_2.1.0               
+ [11] bit64_4.0.5                 fansi_1.0.3                
+ [13] xml2_1.3.3                  logging_0.10-108           
+ [15] codetools_0.2-18            cachem_1.0.6               
+ [17] knitr_1.39                  jsonlite_1.8.0             
+ [19] workflowr_1.7.0             Rsamtools_2.12.0           
+ [21] dbplyr_2.1.1                png_0.1-7                  
+ [23] readr_2.1.2                 compiler_4.2.0             
+ [25] httr_1.4.3                  assertthat_0.2.1           
+ [27] Matrix_1.5-3                fastmap_1.1.0              
+ [29] lazyeval_0.2.2              cli_3.6.1                  
+ [31] formatR_1.12                later_1.3.0                
+ [33] htmltools_0.5.2             prettyunits_1.1.1          
+ [35] tools_4.2.0                 gtable_0.3.6               
+ [37] glue_1.6.2                  GenomeInfoDbData_1.2.8     
+ [39] rappdirs_0.3.3              Rcpp_1.0.12                
+ [41] jquerylib_0.1.4             vctrs_0.6.5                
+ [43] Biostrings_2.64.0           rtracklayer_1.56.0         
+ [45] crosstalk_1.2.0             xfun_0.41                  
+ [47] stringr_1.5.1               irlba_2.3.5                
+ [49] lifecycle_1.0.4             restfulr_0.0.14            
+ [51] XML_3.99-0.14               zoo_1.8-10                 
+ [53] zlibbioc_1.42.0             scales_1.4.0               
+ [55] gggrid_0.2-0                hms_1.1.1                  
+ [57] promises_1.2.0.1            MatrixGenerics_1.8.0       
+ [59] ProtGenerics_1.28.0         parallel_4.2.0             
+ [61] SummarizedExperiment_1.26.1 lambda.r_1.2.4             
+ [63] LDlinkR_1.2.3               RColorBrewer_1.1-3         
+ [65] yaml_2.3.5                  curl_4.3.2                 
+ [67] memoise_2.0.1               sass_0.4.1                 
+ [69] biomaRt_2.54.1              stringi_1.7.6              
+ [71] highr_0.9                   BiocIO_1.6.0               
+ [73] filelock_1.0.2              BiocParallel_1.30.3        
+ [75] repr_1.1.4                  rlang_1.1.2                
+ [77] pkgconfig_2.0.3             matrixStats_0.62.0         
+ [79] bitops_1.0-7                evaluate_0.15              
+ [81] lattice_0.20-45             purrr_1.0.2                
+ [83] labeling_0.4.2              GenomicAlignments_1.32.0   
+ [85] htmlwidgets_1.5.4           cowplot_1.1.1              
+ [87] bit_4.0.4                   tidyselect_1.2.0           
+ [89] magrittr_2.0.3              AMR_2.1.1                  
+ [91] R6_2.5.1                    generics_0.1.4             
+ [93] DelayedArray_0.22.0         DBI_1.2.2                  
+ [95] withr_2.5.0                 pillar_1.9.0               
+ [97] whisker_0.4                 mixsqp_0.3-43              
+ [99] KEGGREST_1.36.3             RCurl_1.98-1.7             
+[101] tibble_3.2.1                crayon_1.5.1               
+[103] futile.options_1.0.1        utf8_1.2.2                 
+[105] BiocFileCache_2.4.0         plotly_4.10.0              
+[107] tzdb_0.4.0                  rmarkdown_2.25             
+[109] progress_1.2.2              data.table_1.14.2          
+[111] blob_1.2.3                  git2r_0.30.1               
+[113] S7_0.2.0                    digest_0.6.29              
+[115] tidyr_1.3.0                 httpuv_1.6.5               
+[117] viridisLite_0.4.0           skimr_2.1.4                
+[119] bslib_0.3.1                </code></pre>
+</div>
 </div>
 </div>
 </div>
