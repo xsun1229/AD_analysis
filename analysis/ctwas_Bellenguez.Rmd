@@ -165,7 +165,7 @@ The cTWAS analysis was performed using `run_ctwas.R` located at `/project/xinhe/
 - caQTL: `caQTL_naive_RASQUAL.db`, `caQTL_SL1344_RASQUAL.db`
 - eQTL: `eQTL_naive_RASQUAL.db`, `eQTL_SL1344_RASQUAL.db`
 
-# Peaks used in weights
+# Molecular traits used in weights
 
 ## caQTL
 
@@ -205,6 +205,43 @@ draw.pairwise.venn(
   print.mode = c("raw", "percent")
 )
 grid.text("caQTL: Peaks in Weight Databases", y = 0.95, gp = gpar(fontsize = 14))
+```
+
+## eQTL
+
+We compare the genes present in the naive and SL1344 eQTL weight databases.
+
+```{r eQTL-genes, fig.width=6, fig.height=5}
+db_naive_e <- dbConnect(SQLite(), file.path(weight_dir, "eQTL_naive_RASQUAL.db"))
+genes_naive <- dbGetQuery(db_naive_e, "SELECT gene FROM extra")$gene
+dbDisconnect(db_naive_e)
+
+db_sl_e <- dbConnect(SQLite(), file.path(weight_dir, "eQTL_SL1344_RASQUAL.db"))
+genes_sl <- dbGetQuery(db_sl_e, "SELECT gene FROM extra")$gene
+dbDisconnect(db_sl_e)
+
+n_naive_e <- length(genes_naive)
+n_sl_e <- length(genes_sl)
+n_shared_e <- length(intersect(genes_naive, genes_sl))
+
+grid.newpage()
+draw.pairwise.venn(
+  area1 = n_naive_e,
+  area2 = n_sl_e,
+  cross.area = n_shared_e,
+  category = c("Naive", "SL1344"),
+  scaled = TRUE,
+  fill = c("#E69F00", "#56B4E9"),
+  alpha = 0.5,
+  cat.pos = c(-20, 20),
+  cat.dist = 0.05,
+  cat.cex = 1.2,
+  cex = 1.1,
+  label.col = "black",
+  ext.text = FALSE,
+  print.mode = c("raw", "percent")
+)
+grid.text("eQTL: Genes in Weight Databases", y = 0.95, gp = gpar(fontsize = 14))
 ```
 
 # cTWAS results
@@ -337,4 +374,71 @@ plot_piechart_topn(ctwas_param_eQTL,
                    colors = c("#E69F00", "#56B4E9"),
                    by = "category",
                    title = "eQTL - Percent of Heritability (PVE)")
+```
+
+### Fine-mapping results (PIP > 0.8)
+
+```{r eQTL-finemap}
+finemap_eQTL <- readRDS(file.path(outputdir, "eQTL",
+                         "AD.eQTL.shared_all.L5.finemap_regions_res.RDS"))
+fm_eQTL <- finemap_eQTL$finemap_res
+
+genes_high_pip <- fm_eQTL[fm_eQTL$type != "SNP" & fm_eQTL$susie_pip > 0.8, ]
+genes_high_pip <- genes_high_pip[order(-genes_high_pip$susie_pip), ]
+```
+
+**`r nrow(genes_high_pip)` genes** with PIP > 0.8:
+
+```{r eQTL-finemap-table}
+if (nrow(genes_high_pip) > 0) {
+  datatable(genes_high_pip,
+            caption = "eQTL genes with PIP > 0.8",
+            options = list(pageLength = 20, scrollX = TRUE))
+} else {
+  cat("No genes found with PIP > 0.8.")
+}
+```
+
+### Locus zoom plots
+
+Locus zoom plots for regions containing genes with PIP > 0.8.
+
+```{r eQTL-locusplot-prep}
+weights_eQTL <- readRDS(file.path(outputdir, "eQTL", "AD.eQTL.preprocessed.weights.RDS"))
+mapping_table_eQTL <- readRDS("/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/RNA_mapping.RDS")
+
+fm_eQTL_anno <- fm_eQTL
+fm_eQTL_anno$pval <- z2p(fm_eQTL_anno$z)
+
+fm_eQTL_anno <- anno_finemap_res(fm_eQTL_anno,
+                                  snp_map = snp_map,
+                                  mapping_table = mapping_table_eQTL,
+                                  add_gene_annot = TRUE,
+                                  map_by = "molecular_id",
+                                  drop_unmapped = TRUE,
+                                  add_position = TRUE,
+                                  use_gene_pos = "mid")
+
+top_regions_eQTL <- unique(fm_eQTL_anno$region_id[fm_eQTL_anno$group != "SNP" & fm_eQTL_anno$susie_pip > 0.8])
+```
+
+```{r eQTL-locusplots, fig.width=10, fig.height=8, results='asis'}
+for (region_id in top_regions_eQTL) {
+  cat(sprintf("\n#### Region: %s\n\n", region_id))
+
+  print(make_locusplot(
+    fm_eQTL_anno,
+    region_id = region_id,
+    ens_db = ens_db,
+    weights = weights_eQTL,
+    highlight_pip = 0.8,
+    filter_protein_coding_genes = TRUE,
+    filter_cs = TRUE,
+    color_pval_by = "cs",
+    color_pip_by = "cs",
+    panel.heights = c(4, 4, 1, 4)
+  ))
+
+  cat("\n\n")
+}
 ```
