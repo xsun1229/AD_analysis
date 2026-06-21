@@ -333,7 +333,98 @@ for (region_id in top_regions_caQTL) {
     weights = weights_caQTL,
     highlight_pip = 0.8,
     filter_protein_coding_genes = FALSE,
-    filter_cs = TRUE,
+    filter_cs = F,
+    color_pval_by = "cs",
+    color_pip_by = "cs",
+    panel.heights = c(4, 4, 1, 4)
+  ))
+
+  cat("\n\n")
+}
+```
+
+### Peak Sets
+
+A **peak set** is defined as all caQTL peaks that belong to the same credible set (CS) within the same LD region. The PIP of a peak set is the sum of the individual peak PIPs.
+
+```{r caQTL-peak-sets}
+peaks_in_cs_caQTL <- fm_caQTL[fm_caQTL$type == "caQTL" & !is.na(fm_caQTL$cs), ]
+
+mapping_caQTL <- readRDS("/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/ATAC_peak_mapping.RDS")
+peaks_annot_caQTL <- merge(peaks_in_cs_caQTL, mapping_caQTL, by = "molecular_id", all.x = TRUE)
+
+peak_sets_caQTL <- do.call(rbind, lapply(
+  split(peaks_annot_caQTL, list(peaks_annot_caQTL$region_id, peaks_annot_caQTL$cs), drop = TRUE),
+  function(x) {
+    region_parts <- strsplit(x$region_id[1], "_")[[1]]
+    data.frame(
+      region_chr   = as.integer(region_parts[1]),
+      region_id    = x$region_id[1],
+      cs           = x$cs[1],
+      n_peaks      = nrow(x),
+      sum_pip      = sum(x$susie_pip),
+      peaks        = paste(x$molecular_id, collapse = ", "),
+      contexts     = paste(x$context, collapse = ", "),
+      peak_coords  = paste0("chr", x$chrom, ":", x$start, "-", x$end, collapse = "; "),
+      stringsAsFactors = FALSE
+    )
+  }
+))
+peak_sets_caQTL <- peak_sets_caQTL[order(-peak_sets_caQTL$sum_pip), ]
+rownames(peak_sets_caQTL) <- NULL
+
+cat("**Total peak sets:**", nrow(peak_sets_caQTL), "\n")
+```
+
+### PIP Distribution of Peak Sets
+
+```{r caQTL-peak-sets-pip-hist, fig.width=6, fig.height=4}
+hist(peak_sets_caQTL$sum_pip, breaks = 20, col = "steelblue", border = "white",
+     main = "Distribution of peak set PIPs",
+     xlab = "Sum PIP per peak set", ylab = "Count")
+abline(v = 0.8, col = "red", lty = 2)
+text(0.8, par("usr")[4] * 0.9, "PIP = 0.8", pos = 2, col = "red", cex = 0.8)
+```
+
+### High-Confidence Peak Sets (sum PIP > 0.8)
+
+```{r caQTL-peak-sets-high}
+high_caQTL <- peak_sets_caQTL[peak_sets_caQTL$sum_pip > 0.8, ]
+
+if (nrow(high_caQTL) > 0) {
+  display_high_caQTL <- high_caQTL[, c("region_chr", "region_id", "cs", "n_peaks",
+                                        "sum_pip", "peaks", "contexts", "peak_coords")]
+  colnames(display_high_caQTL) <- c("Chr", "Region", "CS", "N peaks",
+                                     "Sum PIP", "Peaks", "Contexts", "Peak coordinates")
+  datatable(display_high_caQTL, rownames = FALSE,
+            options = list(pageLength = 25, scrollX = TRUE),
+            caption = "Peak sets with sum PIP > 0.8") %>%
+    formatRound("Sum PIP", digits = 4)
+} else {
+  cat("No peak sets with sum PIP > 0.8.\n")
+}
+```
+
+### Locus zoom plots for high-confidence peak sets
+
+Locus zoom plots for regions containing peak sets with sum PIP > 0.8.
+
+```{r caQTL-peakset-locusplot-prep}
+top_regions_peakset_caQTL <- unique(high_caQTL$region_id)
+```
+
+```{r caQTL-peakset-locusplots, fig.width=10, fig.height=8, results='asis'}
+for (region_id in top_regions_peakset_caQTL) {
+  cat(sprintf("\n#### Region: %s\n\n", region_id))
+
+  print(make_locusplot(
+    fm_caQTL_anno,
+    region_id = region_id,
+    ens_db = ens_db,
+    weights = weights_caQTL,
+    highlight_pip = 0.8,
+    filter_protein_coding_genes = FALSE,
+    filter_cs = F,
     color_pval_by = "cs",
     color_pip_by = "cs",
     panel.heights = c(4, 4, 1, 4)
@@ -433,7 +524,197 @@ for (region_id in top_regions_eQTL) {
     weights = weights_eQTL,
     highlight_pip = 0.8,
     filter_protein_coding_genes = TRUE,
-    filter_cs = TRUE,
+    filter_cs = F,
+    color_pval_by = "cs",
+    color_pip_by = "cs",
+    panel.heights = c(4, 4, 1, 4)
+  ))
+
+  cat("\n\n")
+}
+```
+
+## caQTL_SL1344 + eQTL_SL1344 (Joint)
+
+```{r joint-load}
+param_joint <- readRDS(file.path(outputdir, "joint_caQTL_eQTL_SL1344", "AD.joint.param.shared_all.RDS"))
+```
+
+### Convergence
+
+```{r joint-convergence, fig.width=10, fig.height=6}
+make_convergence_plots(param_joint, gwas_n)
+```
+
+### Parameters and Enrichment
+
+```{r joint-param}
+ctwas_param_joint <- summarize_param(param_joint, gwas_n, enrichment_test = "fisher")
+ctwas_param_joint
+```
+
+### Heritability Pie Chart
+
+```{r joint-piechart, fig.width=7, fig.height=5}
+plot_piechart_topn(ctwas_param_joint,
+                   colors = c("#E69F00", "#56B4E9"),
+                   by = "category",
+                   title = "caQTL_SL1344 + eQTL_SL1344 - Percent of Heritability (PVE)")
+```
+
+### Fine-mapping results (PIP > 0.8)
+
+```{r joint-finemap}
+finemap_joint <- readRDS(file.path(outputdir, "joint_caQTL_eQTL_SL1344",
+                         "AD.joint.shared_all.L5.finemap_regions_res.RDS"))
+fm_joint <- finemap_joint$finemap_res
+
+traits_high_pip_joint <- fm_joint[fm_joint$type != "SNP" & fm_joint$susie_pip > 0.8, ]
+traits_high_pip_joint <- traits_high_pip_joint[order(-traits_high_pip_joint$susie_pip), ]
+```
+
+**`r nrow(traits_high_pip_joint)` molecular traits** with PIP > 0.8:
+
+```{r joint-finemap-table}
+if (nrow(traits_high_pip_joint) > 0) {
+  datatable(traits_high_pip_joint,
+            caption = "Joint caQTL_SL1344 + eQTL_SL1344: traits with PIP > 0.8",
+            options = list(pageLength = 20, scrollX = TRUE))
+} else {
+  cat("No traits found with PIP > 0.8.")
+}
+```
+
+### Locus zoom plots
+
+Locus zoom plots for regions containing molecular traits with PIP > 0.8.
+
+```{r joint-locusplot-prep}
+weights_joint <- readRDS(file.path(outputdir, "joint_caQTL_eQTL_SL1344", "AD.joint.preprocessed.weights.RDS"))
+
+mapping_table_joint <- rbind(
+  readRDS("/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/ATAC_peak_mapping.RDS"),
+  readRDS("/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/RNA_mapping.RDS")
+)
+
+fm_joint_anno <- fm_joint
+fm_joint_anno$pval <- z2p(fm_joint_anno$z)
+
+fm_joint_anno <- anno_finemap_res(fm_joint_anno,
+                                  snp_map = snp_map,
+                                  mapping_table = mapping_table_joint,
+                                  add_gene_annot = TRUE,
+                                  map_by = "molecular_id",
+                                  drop_unmapped = TRUE,
+                                  add_position = TRUE,
+                                  use_gene_pos = "mid")
+
+top_regions_joint <- unique(fm_joint_anno$region_id[fm_joint_anno$group != "SNP" & fm_joint_anno$susie_pip > 0.8])
+```
+
+```{r joint-locusplots, fig.width=10, fig.height=8, results='asis'}
+for (region_id in top_regions_joint) {
+  cat(sprintf("\n#### Region: %s\n\n", region_id))
+
+  print(make_locusplot(
+    fm_joint_anno,
+    region_id = region_id,
+    ens_db = ens_db,
+    weights = weights_joint,
+    highlight_pip = 0.8,
+    filter_protein_coding_genes = FALSE,
+    filter_cs = F,
+    color_pval_by = "cs",
+    color_pip_by = "cs",
+    panel.heights = c(4, 4, 1, 4)
+  ))
+
+  cat("\n\n")
+}
+```
+
+### Peak Sets (caQTL in joint model)
+
+A **peak set** is defined as all caQTL peaks that belong to the same credible set (CS) within the same LD region. The PIP of a peak set is the sum of the individual peak PIPs.
+
+```{r joint-peak-sets}
+peaks_in_cs_joint <- fm_joint[fm_joint$type == "caQTL" & !is.na(fm_joint$cs), ]
+
+mapping_joint_caQTL <- readRDS("/project/xinhe/xsun/AD_jubao/data/QTL_pmid29379200/ATAC_peak_mapping.RDS")
+peaks_annot_joint <- merge(peaks_in_cs_joint, mapping_joint_caQTL, by = "molecular_id", all.x = TRUE)
+
+peak_sets_joint <- do.call(rbind, lapply(
+  split(peaks_annot_joint, list(peaks_annot_joint$region_id, peaks_annot_joint$cs), drop = TRUE),
+  function(x) {
+    region_parts <- strsplit(x$region_id[1], "_")[[1]]
+    data.frame(
+      region_chr   = as.integer(region_parts[1]),
+      region_id    = x$region_id[1],
+      cs           = x$cs[1],
+      n_peaks      = nrow(x),
+      sum_pip      = sum(x$susie_pip),
+      peaks        = paste(x$molecular_id, collapse = ", "),
+      contexts     = paste(x$context, collapse = ", "),
+      peak_coords  = paste0("chr", x$chrom, ":", x$start, "-", x$end, collapse = "; "),
+      stringsAsFactors = FALSE
+    )
+  }
+))
+peak_sets_joint <- peak_sets_joint[order(-peak_sets_joint$sum_pip), ]
+rownames(peak_sets_joint) <- NULL
+
+cat("**Total peak sets:**", nrow(peak_sets_joint), "\n")
+```
+
+### PIP Distribution of Peak Sets (joint)
+
+```{r joint-peak-sets-pip-hist, fig.width=6, fig.height=4}
+hist(peak_sets_joint$sum_pip, breaks = 20, col = "steelblue", border = "white",
+     main = "Distribution of peak set PIPs (joint model)",
+     xlab = "Sum PIP per peak set", ylab = "Count")
+abline(v = 0.8, col = "red", lty = 2)
+text(0.8, par("usr")[4] * 0.9, "PIP = 0.8", pos = 2, col = "red", cex = 0.8)
+```
+
+### High-Confidence Peak Sets (sum PIP > 0.8, joint)
+
+```{r joint-peak-sets-high}
+high_joint <- peak_sets_joint[peak_sets_joint$sum_pip > 0.8, ]
+
+if (nrow(high_joint) > 0) {
+  display_high_joint <- high_joint[, c("region_chr", "region_id", "cs", "n_peaks",
+                                        "sum_pip", "peaks", "contexts", "peak_coords")]
+  colnames(display_high_joint) <- c("Chr", "Region", "CS", "N peaks",
+                                     "Sum PIP", "Peaks", "Contexts", "Peak coordinates")
+  datatable(display_high_joint, rownames = FALSE,
+            options = list(pageLength = 25, scrollX = TRUE),
+            caption = "Peak sets with sum PIP > 0.8 (joint model)") %>%
+    formatRound("Sum PIP", digits = 4)
+} else {
+  cat("No peak sets with sum PIP > 0.8.\n")
+}
+```
+
+### Locus zoom plots for high-confidence peak sets (joint)
+
+Locus zoom plots for regions containing peak sets with sum PIP > 0.8.
+
+```{r joint-peakset-locusplot-prep}
+top_regions_peakset_joint <- unique(high_joint$region_id)
+```
+
+```{r joint-peakset-locusplots, fig.width=10, fig.height=8, results='asis'}
+for (region_id in top_regions_peakset_joint) {
+  cat(sprintf("\n#### Region: %s\n\n", region_id))
+
+  print(make_locusplot(
+    fm_joint_anno,
+    region_id = region_id,
+    ens_db = ens_db,
+    weights = weights_joint,
+    highlight_pip = 0.8,
+    filter_protein_coding_genes = FALSE,
+    filter_cs = F,
     color_pval_by = "cs",
     color_pip_by = "cs",
     panel.heights = c(4, 4, 1, 4)
